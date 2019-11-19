@@ -4,16 +4,16 @@ import 'package:timeago/timeago.dart' as timeago;
 import '../components/TripCard.dart';
 import '../models/Trip.dart';
 
-class TripsScreen extends StatefulWidget {
+class TripListScreen extends StatefulWidget {
   final String title;
 
-  TripsScreen({ Key key, this.title }) : super(key: key);
+  TripListScreen({ Key key, this.title }) : super(key: key);
 
   @override
-  _TripsScreenState createState() => _TripsScreenState();
+  _TripListScreenState createState() => _TripListScreenState();
 }
 
-class _TripsScreenState extends State<TripsScreen> {
+class _TripListScreenState extends State<TripListScreen> {
   List<Trip> _trips;
 
   @override

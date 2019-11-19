@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../components/TripCard.dart';
 import '../models/Trip.dart';
-import 'TripsScreen.dart';
+import 'TripListScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String title;
@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: OutlineButton(
                   child: Text('VER TODAS'),
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => TripsScreen(title: widget.title)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => TripListScreen(title: widget.title)));
                   },
                 ),
               ),
