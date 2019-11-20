@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class CheckListScreen extends StatefulWidget{
   final String title;
@@ -16,8 +16,14 @@ class _ChecklistScreenState extends State<CheckListScreen>{
   }
 
   @override
-  Widget build(BuildContext context){
-
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.refresh), onPressed: () {}),
+        ],
+      ),
+    );
   }
-
 }

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:travel_checklist/models/ChecklistItem.dart';
 
-class ChecklistCard extends StatefulWidget {
+class ChecklistItemCard extends StatefulWidget {
   final String title;
   final ChecklistItem checklistitem;
 
-  ChecklistCard({Key key, this.title, this.checklistitem}) : super(key: key);
+  ChecklistItemCard({Key key, this.title, this.checklistitem}) : super(key: key);
 
   @override
-  _ChecklistCardState createState() => _ChecklistCardState(this.checklistitem);
+  _ChecklistItemCardState createState() => _ChecklistItemCardState(this.checklistitem);
 }
 
-class _ChecklistCardState extends State<ChecklistCard>{
+class _ChecklistItemCardState extends State<ChecklistItemCard>{
 
   final ChecklistItem checklistitem;
-  _ChecklistCardState(this.checklistitem);
+  _ChecklistItemCardState(this.checklistitem);
 
   @override
   void initState() {
