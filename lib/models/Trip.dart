@@ -1,5 +1,5 @@
-import 'Checklist.dart';
-import 'Progress.dart';
+import 'package:travel_checklist/models/Checklist.dart';
+import 'package:travel_checklist/models/Progress.dart';
 
 class Trip {
   int _id = 0;
@@ -38,7 +38,7 @@ class Trip {
   }
 
   void addChecklist(Checklist checklist) {
-    checklist.listenToStream(this._updateProgress);
+    checklist.stream.listen(this._updateProgress);
     this._progress.total += checklist.progress.total;
     this._checklists.add(checklist);
   }
@@ -49,7 +49,7 @@ class Trip {
   
   void removeChecklist(int id) {
     Checklist checklist = this.getChecklist(id);
-    checklist.closeStream();
+    checklist.stream.close();
     this._progress.current -= checklist.progress.current;
     this._progress.total -= checklist.progress.total;
     this._checklists.remove(checklist);

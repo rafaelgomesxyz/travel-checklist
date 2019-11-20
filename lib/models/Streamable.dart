@@ -1,6 +1,6 @@
 import 'dart:async';
 
-abstract class Streamable<T> {
+class Streamable<T> {
   // ignore: close_sinks
   StreamController<T> _streamController;
 
@@ -12,16 +12,16 @@ abstract class Streamable<T> {
     this._streamController = StreamController<T>.broadcast();
   }
 
-  void listenToStream(void Function(T) listener) {
+  void listen(void Function(T) listener) {
     this._streamController.stream.listen(listener);
   }
 
-  void emitToStream(T value) {
+  void emit(T value) {
     this._streamController.add(value);
   }
 
   // Always call this method when no longer using an instance to avoid memory leak.
-  void closeStream() {
+  void close() {
     this._streamController.close();
   }
 }
