@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:travel_checklist/screens/TripFormScreen.dart';
 import '../components/TripCard.dart';
 import '../models/Trip.dart';
 import 'TripListScreen.dart';
@@ -96,7 +97,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.blueAccent,
                   textColor: Colors.white,
                   child: Text('PRAIA'),
-                  onPressed: () { },
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'PRAIA')));
+                  },
                 ),
               ),
               alignment: Alignment.center,
@@ -108,7 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.blueAccent,
                   textColor: Colors.white,
                   child: Text('CAMPO'),
-                  onPressed: () { },
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CAMPO')));
+                  },
                 ),
               ),
               alignment: Alignment.center,
@@ -120,7 +125,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.blueAccent,
                   textColor: Colors.white,
                   child: Text('CIDADE'),
-                  onPressed: () { },
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CIDADE')));
+                  },
                 ),
               ),
               alignment: Alignment.center,

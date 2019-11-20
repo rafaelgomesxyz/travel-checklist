@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:travel_checklist/screens/TripFormScreen.dart';
 import '../components/TripCard.dart';
 import '../models/Trip.dart';
 
@@ -58,6 +59,7 @@ class _TripListScreenState extends State<TripListScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen()));
           // TODO: implement function to add new trip
         },
         tooltip: 'Adicionar Viagem',
