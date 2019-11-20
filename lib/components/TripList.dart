@@ -36,7 +36,7 @@ class _TripListState extends State<TripList> {
       child: ListView(
         children: this._trips.map((Trip trip) => TripCard(trip)).toList(),
         padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 75.0),
-        //physics: AlwaysScrollableScrollPhysics(),
+        physics: this._numToShow > 0 ? NeverScrollableScrollPhysics() : AlwaysScrollableScrollPhysics(),
       ),
       onRefresh: () async {
         this._resetState();
