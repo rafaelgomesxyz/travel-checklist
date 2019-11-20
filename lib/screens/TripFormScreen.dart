@@ -6,7 +6,7 @@ class TripFormScreen extends StatefulWidget {
   final Trip trip;
   final String template;
 
-  TripFormScreen({ Key key, this.trip, this.template }) : super(key: key);
+  TripFormScreen({Key key, this.trip, this.template}) : super(key: key);
 
   @override
   _TripFormScreenState createState() => _TripFormScreenState();
@@ -17,13 +17,21 @@ class _TripFormScreenState extends State<TripFormScreen> {
   String _title = '';
   String _template = '';
 
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  TextEditingController _titleController = TextEditingController();
+  TextEditingController _destinationController = TextEditingController();
+  TextEditingController _dateController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     if (widget.trip != null) {
-      this._title = 'Editar - ${widget.trip.title}';
-    } else {
       this._isCreating = false;
+      this._title = 'Editar - ${widget.trip.title}';
+      this._titleController.text = widget.trip.title;
+      this._destinationController.text = widget.trip.destination;
+      this._dateController.text = widget.trip.timestamp.toString();
+    } else {
       if (widget.template != null) {
         this._template = widget.template;
         this._title = 'Criar Viagem - ${this._template}';
@@ -41,10 +49,113 @@ class _TripFormScreenState extends State<TripFormScreen> {
       appBar: AppBar(
         title: Text(this._title),
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.refresh), onPressed: () {} ),
+          IconButton(icon: Icon(Icons.refresh), onPressed: () {}),
         ],
       ),
-      body: Center(),
+      body: SingleChildScrollView(
+        child: Form(
+          child: Column(
+            children: <Widget>[
+              Icon(
+                Icons.flight,
+                size: 50,
+              ),
+              TextFormField(
+                controller: this._titleController,
+                decoration: InputDecoration(
+                  errorStyle: TextStyle(fontSize: 15.0),
+                  labelStyle: TextStyle(color: Colors.blueAccent),
+                  labelText: 'Título',
+                ),
+                keyboardType: TextInputType.text,
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                  fontSize: 20.0,
+                ),
+                textAlign: TextAlign.left,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'O título não pode ser vazio!';
+                  }
+                },
+              ),
+              TextFormField(
+                enabled: false,
+                controller: this._destinationController,
+                decoration: InputDecoration(
+                  errorStyle: TextStyle(fontSize: 15.0),
+                  labelStyle: TextStyle(color: Colors.blueAccent),
+                  labelText: 'Destino',
+                ),
+                keyboardType: TextInputType.text,
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                  fontSize: 20.0,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              FlatButton.icon(
+                color: Colors.blueAccent,
+                textColor: Colors.white,
+                icon: Icon(Icons.place),
+                label: Text('Escolher Destino'),
+                onPressed: () {
+                  // TODO: implement map
+                },
+              ),
+              TextFormField(
+                enabled: false,
+                controller: this._dateController,
+                decoration: InputDecoration(
+                  errorStyle: TextStyle(fontSize: 15.0),
+                  labelStyle: TextStyle(color: Colors.blueAccent),
+                  labelText: 'Data',
+                ),
+                keyboardType: TextInputType.text,
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                  fontSize: 20.0,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              FlatButton.icon(
+                color: Colors.blueAccent,
+                textColor: Colors.white,
+                icon: Icon(Icons.calendar_today),
+                label: Text('Escolher Data'),
+                onPressed: () {
+                  // TODO: implement date
+                },
+              ),
+              this._buildButton(),
+            ],
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+          ),
+          key: this._formKey,
+        ),
+        padding: EdgeInsets.all(20.0),
+      ),
+    );
+  }
+
+  Widget _buildButton() {
+    return Container(
+      child: RaisedButton(
+        child: Text(
+          this._isCreating ? 'Criar' : 'Editar',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20.0,
+          ),
+        ),
+        color: Colors.blueAccent,
+        onPressed: () {},
+      ),
+      height: 50.0,
+      margin: EdgeInsets.only(
+        bottom: 20.0,
+        top: 20.0,
+      ),
     );
   }
 }
