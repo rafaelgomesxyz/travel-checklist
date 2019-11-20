@@ -93,10 +93,11 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               child: ButtonTheme(
                 minWidth: 200.0,
-                child: FlatButton(
+                child: FlatButton.icon(
                   color: Colors.blueAccent,
                   textColor: Colors.white,
-                  child: Text('PRAIA'),
+                  icon: Icon(Icons.beach_access),
+                  label: Text('PRAIA'),
                   onPressed: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'PRAIA')));
                   },
@@ -107,10 +108,11 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               child: ButtonTheme(
                 minWidth: 200.0,
-                child: FlatButton(
+                child: FlatButton.icon(
                   color: Colors.blueAccent,
                   textColor: Colors.white,
-                  child: Text('CAMPO'),
+                  icon: Icon(Icons.local_florist),
+                  label: Text('CAMPO'),
                   onPressed: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CAMPO')));
                   },
@@ -121,10 +123,11 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               child: ButtonTheme(
                 minWidth: 200.0,
-                child: FlatButton(
+                child: FlatButton.icon(
                   color: Colors.blueAccent,
                   textColor: Colors.white,
-                  child: Text('CIDADE'),
+                  icon: Icon(Icons.location_city),
+                  label: Text('CIDADE'),
                   onPressed: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CIDADE')));
                   },
