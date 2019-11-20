@@ -27,8 +27,7 @@ class _TripListScreenState extends State<TripListScreen> {
         // both default to 16
         marginRight: 18,
         marginBottom: 20,
-        animatedIcon: AnimatedIcons.menu_close,
-        animatedIconTheme: IconThemeData(size: 22.0),
+        child: Icon(Icons.add),
         // this is ignored if animatedIcon is non null
         // child: Icon(Icons.add),
         visible: true,
@@ -42,8 +41,8 @@ class _TripListScreenState extends State<TripListScreen> {
         onClose: () => print('DIAL CLOSED'),
         tooltip: 'Speed Dial',
         heroTag: 'speed-dial-hero-tag',
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Colors.blueAccent,
+        foregroundColor: Colors.white,
         elevation: 8.0,
         shape: CircleBorder(),
         children: [
