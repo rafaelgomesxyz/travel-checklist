@@ -31,6 +31,7 @@ class _TripListScreenState extends State<TripListScreen> {
       int total = random.nextInt(9) + 1;
       int current = random.nextInt(total) + 1;
       Trip trip = Trip(i);
+      trip.destination = current > 5 ? 'Sao Paulo' : 'Rio de Janeiro';
       trip.title = 'Viagem ${i + 1}';
       trip.timestamp = now + current * 1000 * 60 * 60 * 60;
       trip.progress.current = current;

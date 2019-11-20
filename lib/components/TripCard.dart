@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import '../models/Trip.dart';
+import 'package:travel_checklist/models/Trip.dart';
 
 class TripCard extends StatelessWidget {
   final Trip trip;
@@ -44,7 +44,16 @@ class TripCard extends StatelessWidget {
               ],
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
             ),
-            padding: EdgeInsets.all(10.0),
+            padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
+          ),
+          Container(
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.flight),
+                Text(this.trip.destination),
+              ],
+            ),
+            padding: EdgeInsets.fromLTRB(5.0, 10.0, 10.0, 5.0),
           ),
           LinearProgressIndicator(
             value: percentage,
