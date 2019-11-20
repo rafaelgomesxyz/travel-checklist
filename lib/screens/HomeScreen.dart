@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SizedBox(
               child: TripList(numToShow: 3),
-              height: 250.0,
+              height: 260.0,
             ),
             Container(
               child: ButtonTheme(
