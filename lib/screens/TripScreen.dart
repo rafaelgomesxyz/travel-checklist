@@ -22,6 +22,8 @@ class _TripScreenState extends State<TripScreen> {
 
   @override
   Widget build(BuildContext context) {
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(widget.trip.timestamp);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.trip.title),
@@ -29,7 +31,50 @@ class _TripScreenState extends State<TripScreen> {
           IconButton(icon: Icon(Icons.refresh), onPressed: () {} ),
         ],
       ),
-      body: Center(),
+      body: Column(
+        children: <Widget> [
+          Container(
+            child: Row(
+              children: <Widget> [
+                Text(
+                  'DATA',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text('${date.toIso8601String()} (${timeago.format(date, locale: 'pt_BR', allowFromNow: true)})'),
+              ],
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ),
+            margin: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
+          ),
+          Container(
+            child: Row(
+              children: <Widget> [
+                Text(
+                  'DESTINO',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(widget.trip.destination),
+              ],
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ),
+            margin: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
+          ),
+          Container(
+            child: Text(
+              'CHECKLISTS',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            margin: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
+          ),
+        ],
+        crossAxisAlignment: CrossAxisAlignment.start,
+      ),
       floatingActionButton: SpeedDial(
         // both default to 16
         marginRight: 18,
