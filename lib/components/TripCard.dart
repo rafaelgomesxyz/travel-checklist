@@ -46,7 +46,7 @@ class TripCard extends StatelessWidget {
                 ],
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
               ),
-              padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
+              padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 0.0),
             ),
             Container(
               child: Row(
@@ -55,7 +55,7 @@ class TripCard extends StatelessWidget {
                   Text(this.trip.destination),
                 ],
               ),
-              padding: EdgeInsets.fromLTRB(5.0, 10.0, 10.0, 5.0),
+              padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
             ),
             LinearProgressIndicator(
               value: percentage,
