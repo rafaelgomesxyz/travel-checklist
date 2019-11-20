@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/screens/TripFormScreen.dart';
 import '../components/TripCard.dart';
@@ -57,13 +58,58 @@ class _TripListScreenState extends State<TripListScreen> {
       body: Center(
         child: this._trips.length > 0 ? this.buildList() : Text('nothing'),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen()));
-          // TODO: implement function to add new trip
-        },
-        tooltip: 'Adicionar Viagem',
-        child: Icon(Icons.add),
+      floatingActionButton: SpeedDial(
+        // both default to 16
+        marginRight: 18,
+        marginBottom: 20,
+        animatedIcon: AnimatedIcons.menu_close,
+        animatedIconTheme: IconThemeData(size: 22.0),
+        // this is ignored if animatedIcon is non null
+        // child: Icon(Icons.add),
+        visible: true,
+        // If true user is forced to close dial manually
+        // by tapping main button and overlay is not rendered.
+        closeManually: false,
+        curve: Curves.bounceIn,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.5,
+        onOpen: () => print('OPENING DIAL'),
+        onClose: () => print('DIAL CLOSED'),
+        tooltip: 'Speed Dial',
+        heroTag: 'speed-dial-hero-tag',
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 8.0,
+        shape: CircleBorder(),
+        children: [
+          SpeedDialChild(
+            child: Icon(Icons.location_city),
+            backgroundColor: Colors.green,
+            label: 'CIDADE',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CIDADE')));
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.local_florist),
+            backgroundColor: Colors.blue,
+            label: 'CAMPO',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CAMPO')));
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.beach_access),
+            backgroundColor: Colors.red,
+            label: 'PRAIA',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'PRAIA')));
+            },
+          ),
+        ],
       ),
     );
   }
