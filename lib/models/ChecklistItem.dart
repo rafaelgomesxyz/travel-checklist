@@ -2,8 +2,8 @@ import 'package:travel_checklist/models/Streamable.dart';
 
 class ChecklistItem {
   int _id = 0;
-  String _title = '';
   bool _isChecked = false;
+  String _title = '';
 
   final Streamable<bool> _stream = Streamable<bool>();
 
@@ -13,16 +13,16 @@ class ChecklistItem {
 
   int get id => this._id;
 
-  set title(String title) => this._title = title;
-
-  String get title => this._title;
-
   set isChecked(bool isChecked) {
     this._isChecked = isChecked;
     this._stream.emit(this._isChecked);
   }
 
   bool get isChecked => this._isChecked;
+
+  set title(String title) => this._title = title;
+
+  String get title => this._title;
 
   Streamable<bool> get stream => this._stream;
 

@@ -9,9 +9,9 @@ class Progress {
 
   set current(int current) => this._current = current;
 
-  set total(int total) => this._total = total;
-
   int get current => this._current;
+
+  set total(int total) => this._total = total;
 
   int get total => this._total;
 
