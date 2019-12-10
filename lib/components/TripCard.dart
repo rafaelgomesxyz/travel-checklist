@@ -10,7 +10,7 @@ class TripCard extends StatelessWidget {
 
   @override
   build(BuildContext context) {
-    double percentage = this.trip.progress.current / this.trip.progress.total;
+    double percentage = this.trip.progress.total > 0 ? this.trip.progress.current / this.trip.progress.total : 0;
     Color progressColor;
     Color backgroundColor;
     if (percentage < 0.3) {

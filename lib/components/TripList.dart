@@ -1,8 +1,8 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/components/TripCard.dart';
 import 'package:travel_checklist/models/Trip.dart';
+import 'package:travel_checklist/services/DatabaseHelper.dart';
 
 class TripList extends StatefulWidget {
   final int numToShow;
@@ -14,8 +14,10 @@ class TripList extends StatefulWidget {
 }
 
 class _TripListState extends State<TripList> {
-  List<Trip> _trips;
+  List<Trip> _trips = [];
   int _numToShow;
+
+  final _dbHelper = DatabaseHelper.instance;
 
   @override
   void initState() {
@@ -31,12 +33,32 @@ class _TripListState extends State<TripList> {
 
   @override
   build(BuildContext context) {
-    this._sortList();
+    if (this._trips.length > 0) {
+      this._sortList();
+      return RefreshIndicator(
+        child: ListView(
+          children: this._trips.map((Trip trip) => TripCard(trip)).toList(),
+          padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 75.0),
+          physics: this._numToShow > 0
+            ? NeverScrollableScrollPhysics()
+            : AlwaysScrollableScrollPhysics(),
+        ),
+        onRefresh: () async {
+          this._resetState();
+          return;
+        },
+      );
+    }
+
     return RefreshIndicator(
-      child: ListView(
-        children: this._trips.map((Trip trip) => TripCard(trip)).toList(),
-        padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 75.0),
-        physics: this._numToShow > 0 ? NeverScrollableScrollPhysics() : AlwaysScrollableScrollPhysics(),
+      child: Column(
+        children: <Widget> [
+          Container(
+            child: Text('Nenhuma viagem encontrada.'),
+            alignment: Alignment.center,
+          ),
+        ],
+        mainAxisAlignment: MainAxisAlignment.center,
       ),
       onRefresh: () async {
         this._resetState();
@@ -45,21 +67,18 @@ class _TripListState extends State<TripList> {
     );
   }
 
-  void _resetState() {
+  void _resetState() async {
+    List<Map<String, dynamic>> dbTrips = await this._dbHelper.queryAllRows(DatabaseHelper.tableTrip);
     List<Trip> trips = [];
-    Random random = new Random();
-    int now = DateTime.now().millisecondsSinceEpoch;
-    for (int i = 0; i < 15; i++) {
-      int total = random.nextInt(9) + 1;
-      int current = random.nextInt(total) + 1;
-      Trip trip = Trip(i);
-      trip.destination = current > 5 ? 'Sao Paulo' : 'Rio de Janeiro';
-      trip.title = 'Viagem ${i + 1}';
-      trip.timestamp = now + current * 1000 * 60 * 60 * 60;
-      trip.progress.current = current;
-      trip.progress.total = total;
+
+    for (Map<String, dynamic> dbTrip in dbTrips) {
+      Trip trip = Trip(dbTrip[DatabaseHelper.columnId]);
+      trip.title = dbTrip[DatabaseHelper.columnTitle];
+      trip.timestamp = dbTrip[DatabaseHelper.columnTimestamp];
+      trip.destination = dbTrip[DatabaseHelper.columnDestination];
       trips.add(trip);
     }
+
     setState(() {
       this._trips = trips;
     });

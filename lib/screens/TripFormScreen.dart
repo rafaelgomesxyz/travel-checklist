@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:travel_checklist/services/DatabaseHelper.dart';
 import '../models/Trip.dart';
 
 class TripFormScreen extends StatefulWidget {
@@ -16,6 +17,8 @@ class _TripFormScreenState extends State<TripFormScreen> {
   bool _isCreating = true;
   String _title = '';
   String _template = '';
+
+  final _dbHelper = DatabaseHelper.instance;
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _titleController = TextEditingController();
@@ -80,7 +83,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 },
               ),
               TextFormField(
-                enabled: false,
+                //enabled: false,
                 controller: this._destinationController,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(fontSize: 15.0),
@@ -104,14 +107,14 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 },
               ),
               TextFormField(
-                enabled: false,
+                //enabled: false,
                 controller: this._dateController,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(fontSize: 15.0),
                   labelStyle: TextStyle(color: Colors.blueAccent),
                   labelText: 'Data',
                 ),
-                keyboardType: TextInputType.text,
+                keyboardType: TextInputType.number,
                 style: TextStyle(
                   color: Colors.blueAccent,
                   fontSize: 20.0,
@@ -149,7 +152,22 @@ class _TripFormScreenState extends State<TripFormScreen> {
           ),
         ),
         color: Colors.blueAccent,
-        onPressed: () {},
+        onPressed: () async {
+          Map<String, dynamic> trip = {
+            DatabaseHelper.columnTitle: this._titleController.text,
+            DatabaseHelper.columnTimestamp: int.parse(this._dateController.text),
+            DatabaseHelper.columnDestination: this._destinationController.text,
+          };
+
+          if (this._isCreating) {
+            await this._dbHelper.insert(DatabaseHelper.tableTrip, trip);
+          } else {
+            trip[DatabaseHelper.columnId] = widget.trip.id;
+            await this._dbHelper.update(DatabaseHelper.tableTrip, trip);
+          }
+
+          Navigator.pop(context);
+        },
       ),
       height: 50.0,
       margin: EdgeInsets.only(
