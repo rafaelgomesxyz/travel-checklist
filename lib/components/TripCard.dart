@@ -10,9 +10,9 @@ class TripCard extends StatelessWidget {
 
   @override
   build(BuildContext context) {
-    double percentage = this.trip.progress.total > 0 ? this.trip.progress.current / this.trip.progress.total : 0;
     Color progressColor;
     Color backgroundColor;
+    double percentage = this.trip.progress.total > 0 ? this.trip.progress.current / this.trip.progress.total : 0;
     if (percentage < 0.3) {
       progressColor = Colors.redAccent;
       backgroundColor = Color(0x55FF5252);
@@ -29,10 +29,10 @@ class TripCard extends StatelessWidget {
     return GestureDetector(
       child: Card(
         child: Column(
-          children: <Widget>[
+          children: <Widget> [
             Container(
               child: Row(
-                children: <Widget>[
+                children: <Widget> [
                   Text(
                     this.trip.title,
                     style: TextStyle(

@@ -3,7 +3,9 @@ import 'package:travel_checklist/models/Streamable.dart';
 class EventDispatcher {
   Map<String, Streamable> _streams = Map<String, Streamable>();
 
-  static final String eventTrip = "trip";
+  static final String eventTrip = 'trip';
+  static final String eventChecklist = 'checklist';
+  static final String eventChecklistItem = 'checklist_item';
 
   EventDispatcher._privateConstructor(); // classe Singleton
   static final EventDispatcher instance = EventDispatcher._privateConstructor();

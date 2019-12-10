@@ -1,44 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:travel_checklist/models/ChecklistItem.dart';
 
-class ChecklistItemCard extends StatefulWidget {
-  final String title;
-  final ChecklistItem checklistitem;
+class ChecklistItemCard extends StatelessWidget {
+  final ChecklistItem item;
 
-  ChecklistItemCard({Key key, this.title, this.checklistitem}) : super(key: key);
-
-  @override
-  _ChecklistItemCardState createState() => _ChecklistItemCardState(this.checklistitem);
-}
-
-class _ChecklistItemCardState extends State<ChecklistItemCard>{
-
-  final ChecklistItem checklistitem;
-  _ChecklistItemCardState(this.checklistitem);
+  ChecklistItemCard(this.item);
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  build(BuildContext context){
-    return Dismissible(
+  build(BuildContext context) {
+    return GestureDetector(
       child: Card(
-          child: CheckboxListTile(
-            title: Text(this.checklistitem.title),
-            value: this.checklistitem.isChecked,
-            onChanged:  (bool value){
-              setState(() {
-                this.checklistitem.uncheck();
-              });
-            },
-          )
+        child: Column(
+          children: <Widget> [
+            Container(
+              child: Row(
+                children: <Widget> [
+                  Text(
+                    this.item.title,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              ),
+              padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 0.0),
+            ),
+          ],
+          crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+        margin: EdgeInsets.all(10.0),
       ),
-      background: Container(
-        color: Colors.red,
-        child: Icon(Icons.remove_circle_outline),
-      ), key: Key(this.checklistitem.id.toString()),
+      onTap: () {
+        // TODO: Toggle checklist box
+      },
     );
   }
 }
