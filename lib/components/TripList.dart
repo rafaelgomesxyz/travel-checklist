@@ -3,6 +3,7 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/components/TripCard.dart';
 import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
+import 'package:travel_checklist/services/EventDispatcher.dart';
 
 class TripList extends StatefulWidget {
   final int numToShow;
@@ -18,6 +19,7 @@ class _TripListState extends State<TripList> {
   int _numToShow;
 
   final _dbHelper = DatabaseHelper.instance;
+  final _eDispatcher = EventDispatcher.instance;
 
   @override
   void initState() {
@@ -28,7 +30,8 @@ class _TripListState extends State<TripList> {
     } else {
       this._numToShow = 0;
     }
-    this._resetState();
+    this._resetState(true);
+    this._eDispatcher.listen(EventDispatcher.eventTrip, this._resetState);
   }
 
   @override
@@ -44,7 +47,7 @@ class _TripListState extends State<TripList> {
             : AlwaysScrollableScrollPhysics(),
         ),
         onRefresh: () async {
-          this._resetState();
+          this._resetState(true);
           return;
         },
       );
@@ -61,13 +64,13 @@ class _TripListState extends State<TripList> {
         mainAxisAlignment: MainAxisAlignment.center,
       ),
       onRefresh: () async {
-        this._resetState();
+        this._resetState(true);
         return;
       },
     );
   }
 
-  void _resetState() async {
+  void _resetState(dynamic unused) async {
     List<Map<String, dynamic>> dbTrips = await this._dbHelper.queryAllRows(DatabaseHelper.tableTrip);
     List<Trip> trips = [];
 

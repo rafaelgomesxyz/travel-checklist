@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/services/DatabaseHelper.dart';
+import 'package:travel_checklist/services/EventDispatcher.dart';
 import '../models/Trip.dart';
 
 class TripFormScreen extends StatefulWidget {
@@ -19,6 +20,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
   String _template = '';
 
   final _dbHelper = DatabaseHelper.instance;
+  final _eDispatcher = EventDispatcher.instance;
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _titleController = TextEditingController();
@@ -167,6 +169,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
           }
 
           Navigator.pop(context);
+          this._eDispatcher.emit(EventDispatcher.eventTrip, true);
         },
       ),
       height: 50.0,
