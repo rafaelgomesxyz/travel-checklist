@@ -38,10 +38,32 @@ class DatabaseHelper {
   }
 
   Future _onCreate(Database db, int version) async {
-    await db.execute('CREATE TABLE $tableTrip ($columnId INTEGER PRIMARY KEY AUTOINCREMENT, $columnTitle VARCHAR(255) NOT NULL, $columnTimestamp INTEGER NOT NULL, $columnDestination VARCHAR(255) NOT NULL)');
-    await db.execute('CREATE TABLE $tableChecklist ($columnId INTEGER PRIMARY KEY AUTOINCREMENT, $tableTrip INTEGER NOT NULL REFERENCES $tableTrip ($columnId), $columnTitle VARCHAR(255) NOT NULL)');
-    await db.execute('CREATE TABLE $tableItem ($columnId INTEGER PRIMARY KEY AUTOINCREMENT, $columnTitle VARCHAR(255) NOT NULL)');
-    await db.execute('CREATE TABLE $tableChecklistItem ($columnId INTEGER PRIMARY KEY AUTOINCREMENT, $tableItem INTEGER NOT NULL REFERENCES $tableItem ($columnId), $tableChecklist INTEGER NOT NULL REFERENCES $tableChecklist ($columnId), $columnIsChecked TINYINT NOT NULL)');
+    await db.execute('''
+CREATE TABLE $tableTrip (
+$columnId INTEGER PRIMARY KEY AUTOINCREMENT,
+$columnTitle VARCHAR(255) NOT NULL,
+$columnTimestamp INTEGER NOT NULL,
+$columnDestination VARCHAR(255) NOT NULL
+)
+''');
+    await db.execute('''
+CREATE TABLE $tableChecklist (
+$columnId INTEGER PRIMARY KEY AUTOINCREMENT,
+$tableTrip INTEGER NOT NULL REFERENCES $tableTrip ($columnId),
+$columnTitle VARCHAR(255) NOT NULL,
+)''');
+    await db.execute('''
+CREATE TABLE $tableItem (
+$columnId INTEGER PRIMARY KEY AUTOINCREMENT,
+$columnTitle VARCHAR(255) NOT NULL)
+''');
+    await db.execute('''
+CREATE TABLE $tableChecklistItem (
+$columnId INTEGER PRIMARY KEY AUTOINCREMENT,
+$tableItem INTEGER NOT NULL REFERENCES $tableItem ($columnId),
+$tableChecklist INTEGER NOT NULL REFERENCES $tableChecklist ($columnId),
+$columnIsChecked TINYINT NOT NULL)
+''');
   }
 
   Future<int> insert(String table, Map<String, dynamic> row) async {
