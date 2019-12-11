@@ -64,13 +64,12 @@ class _ChecklistItemListState extends State<ChecklistItemList> {
   }
 
   void _resetState(dynamic unused) async {
-    List<Map<String, dynamic>> dbItems = await this._dbHelper.rawQuery('SELECT * FROM ${DatabaseHelper.tableChecklistItem} WHERE checklist = ${this._checklist}');
+    List<Map<String, dynamic>> dbItems = await this._dbHelper.rawQuery('SELECT ci.id, ci.item, ci.checklist, ci.is_checked, i.title FROM ${DatabaseHelper.tableChecklistItem} AS ci INNER JOIN ${DatabaseHelper.tableItem} AS i ON ci.item = i.id WHERE checklist = ${this._checklist} GROUP BY ci.id');
     List<ChecklistItem> items = [];
-
     for (Map<String, dynamic> dbItem in dbItems) {
       ChecklistItem item = ChecklistItem(dbItem[DatabaseHelper.columnId]);
       item.title = dbItem[DatabaseHelper.columnTitle];
-      item.isChecked = dbItem[DatabaseHelper.columnIsChecked];
+      item.isChecked = dbItem[DatabaseHelper.columnIsChecked] == 1 ? true : false;
       items.add(item);
     }
 

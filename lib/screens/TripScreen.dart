@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:travel_checklist/components/ChecklistList.dart';
+import 'package:travel_checklist/screens/ChecklistFormScreen.dart';
 import 'package:travel_checklist/screens/TripFormScreen.dart';
 import '../models/Trip.dart';
 
@@ -72,6 +74,10 @@ class _TripScreenState extends State<TripScreen> {
             ),
             margin: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
           ),
+          SizedBox(
+            child: ChecklistList(trip: widget.trip.id),
+            height: 400.0,
+          ),
         ],
         crossAxisAlignment: CrossAxisAlignment.start,
       ),
@@ -113,6 +119,15 @@ class _TripScreenState extends State<TripScreen> {
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(trip: widget.trip)));
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.playlist_add_check),
+            backgroundColor: Colors.blue,
+            label: 'Adicionar Checklist',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ChecklistFormScreen(trip: widget.trip.id)));
             },
           ),
         ],
