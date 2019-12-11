@@ -7,6 +7,7 @@ import 'package:travel_checklist/components/ChecklistList.dart';
 import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/screens/ChecklistFormScreen.dart';
 import 'package:travel_checklist/screens/TripFormScreen.dart';
+import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
 
 class TripScreen extends StatefulWidget {
@@ -23,6 +24,7 @@ class _TripScreenState extends State<TripScreen> {
 
   StreamSubscription _tripEditedSubscription;
 
+  final _dbHelper = DatabaseHelper.instance;
   final _eDispatcher = EventDispatcher.instance;
 
   @override
@@ -127,7 +129,11 @@ class _TripScreenState extends State<TripScreen> {
             child: Icon(Icons.delete),
             label: 'Deletar Viagem',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () {},
+            onTap: () async {
+              await _dbHelper.deleteTrip(_trip.id);
+              _eDispatcher.emit(EventDispatcher.eventTripRemoved, { 'trip': _trip });
+              Navigator.pop(context);
+            },
           ),
           SpeedDialChild(
             backgroundColor: Colors.green,

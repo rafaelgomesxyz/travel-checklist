@@ -6,6 +6,7 @@ import 'package:travel_checklist/components/ChecklistItemList.dart';
 import 'package:travel_checklist/models/Checklist.dart';
 import 'package:travel_checklist/screens/ChecklistFormScreen.dart';
 import 'package:travel_checklist/screens/ChecklistItemFormScreen.dart';
+import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
 
 class ChecklistScreen extends StatefulWidget {
@@ -22,6 +23,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
 
   StreamSubscription _checklistEditedSubscription;
 
+  final _dbHelper = DatabaseHelper.instance;
   final _eDispatcher = EventDispatcher.instance;
 
   @override
@@ -95,8 +97,10 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
             child: Icon(Icons.delete),
             label: 'Deletar Checklist',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () {
-              // TODO: implementar deletar checklist
+            onTap: () async {
+              await _dbHelper.deleteChecklist(_checklist.id);
+              _eDispatcher.emit(EventDispatcher.eventChecklistRemoved, { 'checklist': _checklist });
+              Navigator.pop(context);
             },
           ),
           SpeedDialChild(

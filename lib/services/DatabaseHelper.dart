@@ -162,14 +162,32 @@ $columnIsChecked TINYINT NOT NULL
     return trips;
   }
 
+  Future<int> deleteChecklistItem(int id) async {
+    Database db = await instance.database;
+    return await db.delete(tableChecklistItem, where: '$columnId = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteChecklist(int id) async {
+    Database db = await instance.database;
+    List<ChecklistItem> items = await getChecklistItems(id);
+    for (ChecklistItem item in items) {
+      await deleteChecklistItem(item.id);
+    }
+    return await db.delete(tableChecklist, where: '$columnId = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteTrip(int id) async {
+    Database db = await instance.database;
+    List<Checklist> checklists = await getChecklists(id);
+    for (Checklist checklist in checklists) {
+      await deleteChecklist(checklist.id);
+    }
+    return await db.delete(tableTrip, where: '$columnId = ?', whereArgs: [id]);
+  }
+
   Future<int> queryRowCount(String table) async {
     Database db = await instance.database;
     return Sqflite.firstIntValue(
       await db.rawQuery('SELECT COUNT(*) FROM $table'));
-  }
-
-  Future<int> delete(String table, int id) async {
-    Database db = await instance.database;
-    return await db.delete(table, where: '$columnId = ?', whereArgs: [id]);
   }
 }

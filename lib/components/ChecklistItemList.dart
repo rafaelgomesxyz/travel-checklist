@@ -116,6 +116,14 @@ class _ChecklistItemListState extends State<ChecklistItemList> {
   }
 
   void _sortList() {
-    _checklist.items.sort((ChecklistItem a, ChecklistItem b) => a.title.compareTo(b.title));
+    _checklist.items.sort((ChecklistItem a, ChecklistItem b) {
+      if (a.isChecked && !b.isChecked) {
+        return 1;
+      }
+      if (!a.isChecked && b.isChecked) {
+        return -1;
+      }
+      return a.title.compareTo(b.title);
+    });
   }
 }

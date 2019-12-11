@@ -123,8 +123,10 @@ class _ChecklistItemCardState extends State<ChecklistItemCard> {
               size: 20.0
             ),
             label: Text('Deletar Item'),
-            onPressed: () {
-              // TODO: implementar deletar item
+            onPressed: () async {
+              await _dbHelper.deleteChecklistItem(_item.id);
+              _eDispatcher.emit(EventDispatcher.eventChecklistItemRemoved, { 'item': _item });
+              Navigator.pop(_context);
             },
             padding: EdgeInsets.all(0.0),
           ),
