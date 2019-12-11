@@ -1,31 +1,32 @@
-import 'package:travel_checklist/models/Streamable.dart';
+import 'dart:async';
 
 class EventDispatcher {
-  Map<String, Streamable> _streams = Map<String, Streamable>();
-
-  static final String eventTrip = 'trip';
-  static final String eventChecklist = 'checklist';
   static final String eventChecklistItem = 'checklist_item';
+  static final String eventChecklist = 'checklist';
+  static final String eventTrip = 'trip';
 
-  EventDispatcher._privateConstructor(); // classe Singleton
+  Map<String, StreamController<Map<String, dynamic>>> _streamControllers = {};
+
+  EventDispatcher._privateConstructor(); // Singleton
   static final EventDispatcher instance = EventDispatcher._privateConstructor();
 
-  void listen(String name, void Function(dynamic) listener) {
-    if (!this._streams.containsKey(name)) {
-      this._streams[name] = Streamable.broadcast();
+  void listen(String name, void Function(Map<String, dynamic>) listener) {
+    if (!this._streamControllers.containsKey(name)) {
+      this._streamControllers[name] = StreamController<Map<String, dynamic>>.broadcast();
     }
-    this._streams[name].listen(listener);
+    this._streamControllers[name].stream.listen(listener);
   }
 
-  void emit(String name, dynamic value) {
-    if (this._streams.containsKey(name)) {
-      this._streams[name].emit(value);
+  void emit(String name, Map<String, dynamic> data) {
+    if (this._streamControllers.containsKey(name)) {
+      this._streamControllers[name].add(data);
     }
   }
 
+  // Always call this when no longer using an instance to avoid memory leaks.
   void close(String name) {
-    if (this._streams.containsKey(name)) {
-      this._streams[name].close();
+    if (this._streamControllers.containsKey(name)) {
+      this._streamControllers[name].close();
     }
   }
 }
