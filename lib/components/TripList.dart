@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/components/TripCard.dart';
@@ -18,6 +19,9 @@ class _TripListState extends State<TripList> {
   List<Trip> _trips = [];
   int _numToShow;
 
+  StreamSubscription _tripAddedSubscription;
+  StreamSubscription _tripRemovedSubscription;
+
   final _dbHelper = DatabaseHelper.instance;
   final _eDispatcher = EventDispatcher.instance;
 
@@ -26,28 +30,36 @@ class _TripListState extends State<TripList> {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
     if (widget.numToShow != null) {
-      this._numToShow = widget.numToShow;
+      _numToShow = widget.numToShow;
     } else {
-      this._numToShow = 0;
+      _numToShow = 0;
     }
-    this._resetState(true);
-    this._eDispatcher.listen(EventDispatcher.eventTrip, this._resetState);
+    _tripAddedSubscription = _eDispatcher.listen(EventDispatcher.eventChecklistAdded, _loadTrips);
+    _tripRemovedSubscription = _eDispatcher.listen(EventDispatcher.eventChecklistRemoved, _loadTrips);
+    _loadTrips({});
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _tripAddedSubscription.cancel();
+    _tripRemovedSubscription.cancel();
   }
 
   @override
   build(BuildContext context) {
-    if (this._trips.length > 0) {
-      this._sortList();
+    if (_trips.length > 0) {
+      _sortList();
       return RefreshIndicator(
         child: ListView(
-          children: this._trips.map((Trip trip) => TripCard(trip)).toList(),
+          children: _trips.map((Trip trip) => TripCard(trip: trip)).toList(),
           padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 75.0),
-          physics: this._numToShow > 0
+          physics: _numToShow > 0
             ? NeverScrollableScrollPhysics()
             : AlwaysScrollableScrollPhysics(),
         ),
         onRefresh: () async {
-          this._resetState(true);
+          _loadTrips({});
           return;
         },
       );
@@ -64,55 +76,31 @@ class _TripListState extends State<TripList> {
         mainAxisAlignment: MainAxisAlignment.center,
       ),
       onRefresh: () async {
-        this._resetState(true);
+        _loadTrips({});
         return;
       },
     );
   }
 
-  void _resetState(dynamic unused) async {
-    List<Map<String, dynamic>> dbTrips = await this._dbHelper.queryAllRows(DatabaseHelper.tableTrip);
-    List<Trip> trips = [];
-
-    for (Map<String, dynamic> dbTrip in dbTrips) {
-      Trip trip = Trip(dbTrip[DatabaseHelper.columnId]);
-      trip.title = dbTrip[DatabaseHelper.columnTitle];
-      trip.timestamp = dbTrip[DatabaseHelper.columnTimestamp];
-      trip.destination = dbTrip[DatabaseHelper.columnDestination];
-      trips.add(trip);
-    }
-
+  void _loadTrips(Map<String, dynamic> unused) async {
+    List<Trip> trips = await _dbHelper.getTrips();
     setState(() {
-      this._trips = trips;
+      _trips = trips;
     });
   }
 
   void _sortList() {
-    this._trips.sort((Trip a, Trip b) {
-      if (a.progress.current == a.progress.total) {
-        return 1;
-      }
-      if (b.progress.current == b.progress.total) {
-        return -1;
-      }
+    _trips.sort((Trip a, Trip b) {
       if (a.timestamp > b.timestamp) {
         return 1;
       }
-      if (a.timestamp < b.timestamp) {
-        return -1;
-      }
-      double aPercentage = a.progress.current / a.progress.total;
-      double bPercentage = b.progress.current / b.progress.total;
-      if (aPercentage > bPercentage) {
-        return 1;
-      }
-      if (aPercentage < bPercentage) {
+      if (b.timestamp > a.timestamp) {
         return -1;
       }
       return 0;
     });
-    if (this._numToShow > 0) {
-      this._trips.removeRange(3, this._trips.length);
+    if (_numToShow > 0 && _trips.length > 3) {
+      _trips.removeRange(3, _trips.length);
     }
   }
 }

@@ -3,29 +3,28 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/screens/TripScreen.dart';
 
-class TripCard extends StatelessWidget {
+class TripCard extends StatefulWidget {
   final Trip trip;
 
-  TripCard(this.trip);
+  TripCard({ Key key, this.trip }) : super(key: key);
+
+  @override
+  _TripCardState createState() => _TripCardState();
+}
+
+class _TripCardState extends State<TripCard> {
+  Trip _trip;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _trip = widget.trip;
+    });
+  }
 
   @override
   build(BuildContext context) {
-    Color progressColor;
-    Color backgroundColor;
-    double percentage = this.trip.progress.total > 0 ? this.trip.progress.current / this.trip.progress.total : 0;
-    if (percentage < 0.3) {
-      progressColor = Colors.redAccent;
-      backgroundColor = Color(0x55FF5252);
-    } else if (percentage < 0.6) {
-      progressColor = Colors.orangeAccent;
-      backgroundColor = Color(0x55FFAB40);
-    } else if (percentage < 1.0) {
-      progressColor = Colors.blueAccent;
-      backgroundColor = Color(0x55448AFF);
-    } else {
-      progressColor = Colors.green;
-      backgroundColor = Colors.green;
-    }
     return GestureDetector(
       child: Card(
         child: Column(
@@ -34,14 +33,14 @@ class TripCard extends StatelessWidget {
               child: Row(
                 children: <Widget> [
                   Text(
-                    this.trip.title,
+                    _trip.title,
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    timeago.format(DateTime.fromMillisecondsSinceEpoch(this.trip.timestamp), locale: 'pt_BR', allowFromNow: true),
+                    timeago.format(DateTime.fromMillisecondsSinceEpoch(_trip.timestamp), locale: 'pt_BR', allowFromNow: true),
                   ),
                 ],
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -50,25 +49,20 @@ class TripCard extends StatelessWidget {
             ),
             Container(
               child: Row(
-                children: <Widget>[
+                children: <Widget> [
                   Icon(Icons.flight),
-                  Text(this.trip.destination),
+                  Text(_trip.destination),
                 ],
               ),
               padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
             ),
-            LinearProgressIndicator(
-              value: percentage,
-              valueColor: AlwaysStoppedAnimation<Color>(progressColor),
-              backgroundColor: backgroundColor,
-            )
           ],
           crossAxisAlignment: CrossAxisAlignment.start,
         ),
         margin: EdgeInsets.all(10.0),
       ),
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => TripScreen(trip: this.trip)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => TripScreen(trip: widget.trip)));
       },
     );
   }

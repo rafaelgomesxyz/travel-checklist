@@ -24,31 +24,27 @@ class _TripListScreenState extends State<TripListScreen> {
       ),
       body: TripList(),
       floatingActionButton: SpeedDial(
-        // both default to 16
-        marginRight: 18,
-        marginBottom: 20,
-        child: Icon(Icons.add),
-        // this is ignored if animatedIcon is non null
-        // child: Icon(Icons.add),
-        visible: true,
-        // If true user is forced to close dial manually
-        // by tapping main button and overlay is not rendered.
+        animatedIcon: AnimatedIcons.menu_close,
+        animatedIconTheme: IconThemeData(size: 22.0),
+        backgroundColor: Colors.white,
         closeManually: false,
         curve: Curves.bounceIn,
+        elevation: 8.0,
+        foregroundColor: Colors.black,
+        heroTag: 'speed-dial-hero-tag',
+        marginBottom: 20,
+        marginRight: 18,
+        onClose: () {},
+        onOpen: () {},
         overlayColor: Colors.black,
         overlayOpacity: 0.5,
-        onOpen: () => print('OPENING DIAL'),
-        onClose: () => print('DIAL CLOSED'),
-        tooltip: 'Speed Dial',
-        heroTag: 'speed-dial-hero-tag',
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.white,
-        elevation: 8.0,
         shape: CircleBorder(),
+        tooltip: 'Speed Dial',
+        visible: true,
         children: [
           SpeedDialChild(
-            child: Icon(Icons.location_city),
             backgroundColor: Colors.green,
+            child: Icon(Icons.location_city),
             label: 'CIDADE',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {
@@ -56,8 +52,8 @@ class _TripListScreenState extends State<TripListScreen> {
             },
           ),
           SpeedDialChild(
-            child: Icon(Icons.local_florist),
             backgroundColor: Colors.blue,
+            child: Icon(Icons.local_florist),
             label: 'CAMPO',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {
@@ -65,8 +61,8 @@ class _TripListScreenState extends State<TripListScreen> {
             },
           ),
           SpeedDialChild(
-            child: Icon(Icons.beach_access),
             backgroundColor: Colors.red,
+            child: Icon(Icons.beach_access),
             label: 'PRAIA',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {

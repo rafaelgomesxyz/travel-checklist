@@ -16,8 +16,6 @@ class DatabaseHelper {
 
   static final columnId = 'id';
   static final columnTitle = 'title';
-  static final columnCurrentItems = 'current_items';
-  static final columnTotalItems = 'total_items';
   static final columnTimestamp = 'timestamp';
   static final columnDestination = 'destination';
   static final columnIsChecked = 'is_checked';
@@ -48,23 +46,20 @@ $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
 $columnTitle VARCHAR(255) NOT NULL,
 $columnTimestamp INTEGER NOT NULL,
 $columnDestination VARCHAR(255) NOT NULL
-)
-''');
+)''');
     await db.execute('''
 CREATE TABLE $tableChecklist (
 $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
 $tableTrip INTEGER NOT NULL REFERENCES $tableTrip ($columnId),
-$columnTitle VARCHAR(255) NOT NULL,
-$columnCurrentItems INTEGER NOT NULL,
-$columnTotalItems INTEGER NOT NULL
+$columnTitle VARCHAR(255) NOT NULL
 )''');
     await db.execute('''
 CREATE TABLE $tableChecklistItem (
 $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
 $tableChecklist INTEGER NOT NULL REFERENCES $tableChecklist ($columnId),
-$columnTitle VARCHAR(255) NOT NULL),
-$columnIsChecked TINYINT NOT NULL)
-''');
+$columnTitle VARCHAR(255) NOT NULL,
+$columnIsChecked TINYINT NOT NULL
+)''');
   }
 
   Future<int> insertChecklistItem(ChecklistItem item) async {
@@ -81,8 +76,6 @@ $columnIsChecked TINYINT NOT NULL)
     Map<String, dynamic> row = {};
     row[tableTrip] = checklist.trip;
     row[columnTitle] = checklist.title;
-    row[columnCurrentItems] = checklist.currentItems;
-    row[columnTotalItems] = checklist.totalItems;
     return await db.insert(tableChecklist, row);
   }
 
@@ -107,8 +100,6 @@ $columnIsChecked TINYINT NOT NULL)
     Database db = await instance.database;
     Map<String, dynamic> row = {};
     row[columnTitle] = checklist.title;
-    row[columnCurrentItems] = checklist.currentItems;
-    row[columnTotalItems] = checklist.totalItems;
     return await db.update(tableChecklist, row, where: '$columnId = ?', whereArgs: [checklist.id]);
   }
 
@@ -126,9 +117,11 @@ $columnIsChecked TINYINT NOT NULL)
     List<ChecklistItem> items = [];
     List<Map<String, dynamic>> rows = await db.rawQuery('SELECT * FROM $tableChecklistItem WHERE $tableChecklist = $checklist');
     for (Map<String, dynamic> row in rows) {
-      ChecklistItem item = ChecklistItem(row[columnId], row[tableChecklist]);
+      ChecklistItem item = ChecklistItem();
+      item.id = row[columnId];
+      item.checklist = row[tableChecklist];
       item.title = row[columnTitle];
-      item.isChecked = row[columnIsChecked];
+      item.isChecked = row[columnIsChecked] == 1;
       items.add(item);
     }
     return items;
@@ -139,10 +132,16 @@ $columnIsChecked TINYINT NOT NULL)
     List<Checklist> checklists = [];
     List<Map<String, dynamic>> rows = await db.rawQuery('SELECT * FROM $tableChecklist WHERE $tableTrip = $trip');
     for (Map<String, dynamic> row in rows) {
-      Checklist checklist = Checklist(row[columnId], row[tableTrip]);
+      Checklist checklist = Checklist();
+      checklist.id = row[columnId];
+      checklist.trip = row[tableTrip];
       checklist.title = row[columnTitle];
-      checklist.currentItems = row[columnCurrentItems];
-      checklist.totalItems = row[columnTotalItems];
+      checklist.checkedItems = Sqflite.firstIntValue(
+        await db.rawQuery('SELECT COUNT(*) FROM $tableChecklistItem WHERE $tableChecklist = ${checklist.id} AND $columnIsChecked = 1')
+      );
+      checklist.totalItems = Sqflite.firstIntValue(
+        await db.rawQuery('SELECT COUNT(*) FROM $tableChecklistItem WHERE $tableChecklist = ${checklist.id}')
+      );
       checklists.add(checklist);
     }
     return checklists;
@@ -153,7 +152,8 @@ $columnIsChecked TINYINT NOT NULL)
     List<Trip> trips = [];
     List<Map<String, dynamic>> rows = await db.query(tableTrip);
     for (Map<String, dynamic> row in rows) {
-      Trip trip = Trip(row[columnId]);
+      Trip trip = Trip();
+      trip.id = row[columnId];
       trip.title = row[columnTitle];
       trip.timestamp = row[columnTimestamp];
       trip.destination = row[columnDestination];
