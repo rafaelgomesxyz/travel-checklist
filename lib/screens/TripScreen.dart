@@ -1,10 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/components/ChecklistList.dart';
+import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/screens/ChecklistFormScreen.dart';
 import 'package:travel_checklist/screens/TripFormScreen.dart';
-import '../models/Trip.dart';
+import 'package:travel_checklist/services/EventDispatcher.dart';
 
 class TripScreen extends StatefulWidget {
   final Trip trip;
@@ -16,21 +19,41 @@ class TripScreen extends StatefulWidget {
 }
 
 class _TripScreenState extends State<TripScreen> {
+  Trip _trip;
+
+  StreamSubscription _tripEditedSubscription;
+
+  final _eDispatcher = EventDispatcher.instance;
+
   @override
   void initState() {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
+    _tripEditedSubscription = _eDispatcher.listen('${EventDispatcher.eventTripEdited}_${widget.trip.id}', _onTripEdited);
+    setState(() {
+      _trip = widget.trip;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _tripEditedSubscription.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(widget.trip.timestamp);
-
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(_trip.timestamp);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.trip.title),
+        title: Text(_trip.title),
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.refresh), onPressed: () {} ),
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              // TODO: resetar
+            },
+          ),
         ],
       ),
       body: Column(
@@ -59,7 +82,7 @@ class _TripScreenState extends State<TripScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(widget.trip.destination),
+                Text(_trip.destination),
               ],
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
             ),
@@ -75,55 +98,50 @@ class _TripScreenState extends State<TripScreen> {
             margin: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
           ),
           Expanded(
-            child: ChecklistList(trip: widget.trip.id),
+            child: ChecklistList(trip: widget.trip),
           ),
         ],
         crossAxisAlignment: CrossAxisAlignment.start,
       ),
       floatingActionButton: SpeedDial(
-        // both default to 16
-        marginRight: 18,
-        marginBottom: 20,
         animatedIcon: AnimatedIcons.menu_close,
         animatedIconTheme: IconThemeData(size: 22.0),
-        // this is ignored if animatedIcon is non null
-        // child: Icon(Icons.add),
-        visible: true,
-        // If true user is forced to close dial manually
-        // by tapping main button and overlay is not rendered.
+        backgroundColor: Colors.white,
         closeManually: false,
         curve: Curves.bounceIn,
+        elevation: 8.0,
+        foregroundColor: Colors.black,
+        heroTag: 'speed-dial-hero-tag',
+        marginBottom: 20,
+        marginRight: 18,
+        onClose: () {},
+        onOpen: () {},
         overlayColor: Colors.black,
         overlayOpacity: 0.5,
-        onOpen: () => print('OPENING DIAL'),
-        onClose: () => print('DIAL CLOSED'),
-        tooltip: 'Speed Dial',
-        heroTag: 'speed-dial-hero-tag',
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 8.0,
         shape: CircleBorder(),
+        tooltip: 'Speed Dial',
+        visible: true,
         children: [
           SpeedDialChild(
-            child: Icon(Icons.delete),
             backgroundColor: Colors.red,
-            label: 'Deletar',
+            child: Icon(Icons.delete),
+            label: 'Deletar Viagem',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {},
           ),
           SpeedDialChild(
-            child: Icon(Icons.edit),
             backgroundColor: Colors.green,
-            label: 'Editar',
+            child: Icon(Icons.edit),
+            label: 'Editar Viagem',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(trip: widget.trip)));
             },
           ),
           SpeedDialChild(
-            child: Icon(Icons.playlist_add_check),
             backgroundColor: Colors.blue,
-            label: 'Adicionar Checklist',
+            child: Icon(Icons.playlist_add_check),
+            label: 'Criar Checklist',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => ChecklistFormScreen(trip: widget.trip.id)));
@@ -132,5 +150,13 @@ class _TripScreenState extends State<TripScreen> {
         ],
       ),
     );
+  }
+
+  void _onTripEdited(Map<String, dynamic> data) {
+    if (mounted) {
+      setState(() {
+        _trip = widget.trip;
+      });
+    }
   }
 }

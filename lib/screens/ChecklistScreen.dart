@@ -35,6 +35,12 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _checklistEditedSubscription.cancel();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

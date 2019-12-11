@@ -2,16 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:travel_checklist/models/Checklist.dart';
 import 'package:travel_checklist/screens/ChecklistScreen.dart';
 
-class ChecklistCard extends StatelessWidget {
+class ChecklistCard extends StatefulWidget {
   final Checklist checklist;
 
-  ChecklistCard(this.checklist);
+  ChecklistCard({ Key key, this.checklist }) : super(key: key);
+
+  @override
+  _ChecklistCardState createState() => _ChecklistCardState();
+}
+
+class _ChecklistCardState extends State<ChecklistCard> {
+  Checklist _checklist;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _checklist = widget.checklist;
+    });
+  }
 
   @override
   build(BuildContext context) {
     Color progressColor;
     Color backgroundColor;
-    double percentage = this.checklist.progress.total > 0 ? this.checklist.progress.current / this.checklist.progress.total : 0;
+    double percentage = _checklist.totalItems > 0 ? _checklist.checkedItems / _checklist.totalItems : 0;
     if (percentage < 0.3) {
       progressColor = Colors.redAccent;
       backgroundColor = Color(0x55FF5252);
@@ -33,7 +48,7 @@ class ChecklistCard extends StatelessWidget {
               child: Row(
                 children: <Widget> [
                   Text(
-                    this.checklist.title,
+                    _checklist.title,
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -55,7 +70,7 @@ class ChecklistCard extends StatelessWidget {
         margin: EdgeInsets.all(10.0),
       ),
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ChecklistScreen(checklist: this.checklist, )));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ChecklistScreen(checklist: widget.checklist )));
       },
     );
   }

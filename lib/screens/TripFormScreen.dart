@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
-import '../models/Trip.dart';
 
 class TripFormScreen extends StatefulWidget {
   final Trip trip;
@@ -24,49 +24,54 @@ class _TripFormScreenState extends State<TripFormScreen> {
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _titleController = TextEditingController();
+  TextEditingController _timestampController = TextEditingController();
   TextEditingController _destinationController = TextEditingController();
-  TextEditingController _dateController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    if (widget.trip != null) {
-      this._isCreating = false;
-      this._title = 'Editar - ${widget.trip.title}';
-      this._titleController.text = widget.trip.title;
-      this._destinationController.text = widget.trip.destination;
-      this._dateController.text = widget.trip.timestamp.toString();
-    } else {
-      if (widget.template != null) {
-        this._template = widget.template;
-        this._title = 'Criar Viagem - ${this._template}';
-      } else {
-        this._template = 'Blank';
-        this._title = 'Criar Viagem';
-      }
-    }
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
+    if (widget.trip == null) {
+      if (widget.template != null) {
+        _template = widget.template;
+        _title = 'Criar Viagem - ${_template}';
+      } else {
+        _template = 'Blank';
+        _title = 'Criar Viagem';
+      }
+    } else {
+      _isCreating = false;
+      _title = 'Editar Viagem - ${widget.trip.title}';
+      _titleController.text = widget.trip.title;
+      _timestampController.text = widget.trip.timestamp.toString();
+      _destinationController.text = widget.trip.destination;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(this._title),
+        title: Text(_title),
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.refresh), onPressed: () {}),
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              // TODO: resetar
+            },
+          ),
         ],
       ),
       body: SingleChildScrollView(
         child: Form(
           child: Column(
-            children: <Widget>[
+            children: <Widget> [
               Icon(
                 Icons.flight,
                 size: 50,
               ),
               TextFormField(
-                controller: this._titleController,
+                controller: _titleController,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(fontSize: 15.0),
                   labelStyle: TextStyle(color: Colors.blueAccent),
@@ -86,31 +91,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
               ),
               TextFormField(
                 //enabled: false,
-                controller: this._destinationController,
-                decoration: InputDecoration(
-                  errorStyle: TextStyle(fontSize: 15.0),
-                  labelStyle: TextStyle(color: Colors.blueAccent),
-                  labelText: 'Destino',
-                ),
-                keyboardType: TextInputType.text,
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 20.0,
-                ),
-                textAlign: TextAlign.left,
-              ),
-              FlatButton.icon(
-                color: Colors.blueAccent,
-                textColor: Colors.white,
-                icon: Icon(Icons.place),
-                label: Text('Escolher Destino'),
-                onPressed: () {
-                  // TODO: implement map
-                },
-              ),
-              TextFormField(
-                //enabled: false,
-                controller: this._dateController,
+                controller: _timestampController,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(fontSize: 15.0),
                   labelStyle: TextStyle(color: Colors.blueAccent),
@@ -132,11 +113,35 @@ class _TripFormScreenState extends State<TripFormScreen> {
                   // TODO: implement date
                 },
               ),
-              this._buildButton(),
+              TextFormField(
+                //enabled: false,
+                controller: _destinationController,
+                decoration: InputDecoration(
+                  errorStyle: TextStyle(fontSize: 15.0),
+                  labelStyle: TextStyle(color: Colors.blueAccent),
+                  labelText: 'Destino',
+                ),
+                keyboardType: TextInputType.text,
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                  fontSize: 20.0,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              FlatButton.icon(
+                color: Colors.blueAccent,
+                textColor: Colors.white,
+                icon: Icon(Icons.place),
+                label: Text('Escolher Destino'),
+                onPressed: () {
+                  // TODO: implement map
+                },
+              ),
+              _buildButton(),
             ],
             crossAxisAlignment: CrossAxisAlignment.stretch,
           ),
-          key: this._formKey,
+          key: _formKey,
         ),
         padding: EdgeInsets.all(20.0),
       ),
@@ -147,7 +152,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
     return Container(
       child: RaisedButton(
         child: Text(
-          this._isCreating ? 'Criar' : 'Editar',
+          _isCreating ? 'Criar' : 'Editar',
           style: TextStyle(
             color: Colors.white,
             fontSize: 20.0,
@@ -155,21 +160,21 @@ class _TripFormScreenState extends State<TripFormScreen> {
         ),
         color: Colors.blueAccent,
         onPressed: () async {
-          Map<String, dynamic> trip = {
-            DatabaseHelper.columnTitle: this._titleController.text,
-            DatabaseHelper.columnTimestamp: int.parse(this._dateController.text),
-            DatabaseHelper.columnDestination: this._destinationController.text,
-          };
-
-          if (this._isCreating) {
-            await this._dbHelper.insert(DatabaseHelper.tableTrip, trip);
+          if (_isCreating) {
+            Trip trip = Trip();
+            trip.title = _titleController.text;
+            trip.timestamp = int.parse(_timestampController.text);
+            trip.destination = _destinationController.text;
+            trip.id = await _dbHelper.insertTrip(trip);
+            _eDispatcher.emit(EventDispatcher.eventTripAdded, { 'trip': trip });
           } else {
-            trip[DatabaseHelper.columnId] = widget.trip.id;
-            await this._dbHelper.update(DatabaseHelper.tableTrip, trip);
+            widget.trip.title = _titleController.text;
+            widget.trip.timestamp = int.parse(_timestampController.text);
+            widget.trip.destination = _destinationController.text;
+            await _dbHelper.updateTrip(widget.trip);
+            _eDispatcher.emit('${EventDispatcher.eventTripEdited}_${widget.trip.id}', { 'trip': widget.trip });
           }
-
           Navigator.pop(context);
-          this._eDispatcher.emit(EventDispatcher.eventTrip, true);
         },
       ),
       height: 50.0,
