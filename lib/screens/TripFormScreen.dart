@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
@@ -43,9 +44,15 @@ class _TripFormScreenState extends State<TripFormScreen> {
       _isCreating = false;
       _title = 'Editar Viagem - ${widget.trip.title}';
       _titleController.text = widget.trip.title;
-      _timestampController.text = widget.trip.timestamp.toString();
+      _timestampController.text = DateTime.fromMillisecondsSinceEpoch(widget.trip.timestamp).toIso8601String();
       _destinationController.text = widget.trip.destination;
     }
+  }
+
+  @override
+  void dispose() {
+    _timestampController.dispose();
+    super.dispose();
   }
 
   @override
@@ -90,7 +97,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 },
               ),
               TextFormField(
-                //enabled: false,
+                enabled: false,
                 controller: _timestampController,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(fontSize: 15.0),
@@ -110,7 +117,17 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 icon: Icon(Icons.calendar_today),
                 label: Text('Escolher Data'),
                 onPressed: () {
-                  // TODO: implement date
+                  DatePicker.showDatePicker(
+                    context,
+                    showTitleActions: true,
+                    onConfirm: (date) {
+                      setState(() {
+                        _timestampController.text = date.toIso8601String();
+                      });
+                    },
+                    currentTime: DateTime.now(),
+                    locale: LocaleType.pt
+                  );
                 },
               ),
               TextFormField(
@@ -163,13 +180,13 @@ class _TripFormScreenState extends State<TripFormScreen> {
           if (_isCreating) {
             Trip trip = Trip();
             trip.title = _titleController.text;
-            trip.timestamp = int.parse(_timestampController.text);
+            trip.timestamp = DateTime.parse(_timestampController.text).millisecondsSinceEpoch;
             trip.destination = _destinationController.text;
             trip.id = await _dbHelper.insertTrip(trip);
             _eDispatcher.emit(EventDispatcher.eventTripAdded, { 'trip': trip });
           } else {
             widget.trip.title = _titleController.text;
-            widget.trip.timestamp = int.parse(_timestampController.text);
+            widget.trip.timestamp = DateTime.parse(_timestampController.text).millisecondsSinceEpoch;
             widget.trip.destination = _destinationController.text;
             await _dbHelper.updateTrip(widget.trip);
             _eDispatcher.emit('${EventDispatcher.eventTripEdited}_${widget.trip.id}', { 'trip': widget.trip });
