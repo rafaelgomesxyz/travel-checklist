@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:travel_checklist/models/Checklist.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
-import '../models/Checklist.dart';
 
 class ChecklistFormScreen extends StatefulWidget {
   final Checklist checklist;
@@ -27,23 +27,28 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.checklist != null) {
-      this._isCreating = false;
-      this._title = 'Editar - ${widget.checklist.title}';
-      this._titleController.text = widget.checklist.title;
-    } else {
-      this._title = 'Criar Checklist';
-    }
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
+    if (widget.checklist == null) {
+      _title = 'Criar Checklist';
+    } else {
+      _isCreating = false;
+      _title = 'Editar Checklist - ${widget.checklist.title}';
+      _titleController.text = widget.checklist.title;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(this._title),
+        title: Text(_title),
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.refresh), onPressed: () {}),
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              // TODO: implementar resetar
+            }
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -55,7 +60,7 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
                 size: 50,
               ),
               TextFormField(
-                controller: this._titleController,
+                controller: _titleController,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(fontSize: 15.0),
                   labelStyle: TextStyle(color: Colors.blueAccent),
@@ -73,11 +78,11 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
                   }
                 },
               ),
-              this._buildButton(),
+              _buildButton(),
             ],
             crossAxisAlignment: CrossAxisAlignment.stretch,
           ),
-          key: this._formKey,
+          key: _formKey,
         ),
         padding: EdgeInsets.all(20.0),
       ),
@@ -88,7 +93,7 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
     return Container(
       child: RaisedButton(
         child: Text(
-          this._isCreating ? 'Criar' : 'Editar',
+          _isCreating ? 'Criar' : 'Editar',
           style: TextStyle(
             color: Colors.white,
             fontSize: 20.0,
@@ -96,20 +101,18 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
         ),
         color: Colors.blueAccent,
         onPressed: () async {
-          Map<String, dynamic> checklist = {
-            DatabaseHelper.columnTitle: this._titleController.text,
-            DatabaseHelper.tableTrip: widget.trip,
-          };
-
-          if (this._isCreating) {
-            await this._dbHelper.insert(DatabaseHelper.tableChecklist, checklist);
+          if (_isCreating) {
+            Checklist checklist = Checklist();
+            checklist.trip = widget.trip;
+            checklist.title = _titleController.text;
+            checklist.id = await _dbHelper.insertChecklist(checklist);
+            _eDispatcher.emit(EventDispatcher.eventChecklistAdded, { 'checklist': checklist });
           } else {
-            checklist[DatabaseHelper.columnId] = widget.checklist.id;
-            await this._dbHelper.update(DatabaseHelper.tableChecklist, checklist);
+            widget.checklist.title = _titleController.text;
+            await _dbHelper.updateChecklist(widget.checklist);
+            _eDispatcher.emit('${EventDispatcher.eventChecklistEdited}_${widget.checklist.id}', { 'item': widget.checklist });
           }
-
           Navigator.pop(context);
-          this._eDispatcher.emit(EventDispatcher.eventChecklist, true);
         },
       ),
       height: 50.0,

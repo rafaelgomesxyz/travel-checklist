@@ -1,12 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/components/ChecklistItemCard.dart';
+import 'package:travel_checklist/models/Checklist.dart';
 import 'package:travel_checklist/models/ChecklistItem.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
 
 class ChecklistItemList extends StatefulWidget {
-  final int checklist;
+  final Checklist checklist;
 
   ChecklistItemList({ Key key, this.checklist }) : super(key: key);
 
@@ -15,8 +18,11 @@ class ChecklistItemList extends StatefulWidget {
 }
 
 class _ChecklistItemListState extends State<ChecklistItemList> {
-  int _checklist = 0;
-  List<ChecklistItem> _items = [];
+  Checklist _checklist;
+
+  StreamSubscription _itemAddedSubscription;
+  StreamSubscription _itemCheckedSubscription;
+  StreamSubscription _itemRemovedSubscription;
 
   final _dbHelper = DatabaseHelper.instance;
   final _eDispatcher = EventDispatcher.instance;
@@ -25,27 +31,35 @@ class _ChecklistItemListState extends State<ChecklistItemList> {
   void initState() {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
-    this._checklist = widget.checklist;
-    this._resetState(true);
-    this._eDispatcher.listen(EventDispatcher.eventChecklistItem, this._resetState);
+    _itemAddedSubscription = _eDispatcher.listen(EventDispatcher.eventChecklistItemAdded, _onItemAdded);
+    _itemCheckedSubscription = _eDispatcher.listen(EventDispatcher.eventChecklistItemChecked, _onItemChecked);
+    _itemRemovedSubscription = _eDispatcher.listen(EventDispatcher.eventChecklistItemRemoved, _onItemRemoved);
+    _loadItems();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _itemAddedSubscription.cancel();
+    _itemCheckedSubscription.cancel();
+    _itemRemovedSubscription.cancel();
   }
 
   @override
   build(BuildContext context) {
-    if (this._items.length > 0) {
-      this._sortList();
+    if (_checklist != null && _checklist.items.length > 0) {
+      _sortList();
       return RefreshIndicator(
         child: ListView(
-          children: this._items.map((ChecklistItem item) => ChecklistItemCard(item)).toList(),
+          children: _checklist.items.map((ChecklistItem item) => ChecklistItemCard(item: item)).toList(),
           padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 75.0),
         ),
         onRefresh: () async {
-          this._resetState(true);
+          _loadItems();
           return;
         },
       );
     }
-
     return RefreshIndicator(
       child: Column(
         children: <Widget> [
@@ -57,28 +71,51 @@ class _ChecklistItemListState extends State<ChecklistItemList> {
         mainAxisAlignment: MainAxisAlignment.center,
       ),
       onRefresh: () async {
-        this._resetState(true);
+        _loadItems();
         return;
       },
     );
   }
 
-  void _resetState(dynamic unused) async {
-    List<Map<String, dynamic>> dbItems = await this._dbHelper.rawQuery('SELECT ci.id, ci.item, ci.checklist, ci.is_checked, i.title FROM ${DatabaseHelper.tableChecklistItem} AS ci INNER JOIN ${DatabaseHelper.tableItem} AS i ON ci.item = i.id WHERE checklist = ${this._checklist} GROUP BY ci.id');
-    List<ChecklistItem> items = [];
-    for (Map<String, dynamic> dbItem in dbItems) {
-      ChecklistItem item = ChecklistItem(dbItem[DatabaseHelper.columnId]);
-      item.title = dbItem[DatabaseHelper.columnTitle];
-      item.isChecked = dbItem[DatabaseHelper.columnIsChecked] == 1 ? true : false;
-      items.add(item);
-    }
-
+  void _loadItems() async {
+    widget.checklist.items = await _dbHelper.getChecklistItems(widget.checklist.id);
     setState(() {
-      this._items = items;
+      _checklist = widget.checklist;
     });
   }
 
+  void _onItemAdded(Map<String, dynamic> data) {
+    if (mounted) {
+      widget.checklist.addItem(data['item']);
+      setState(() {
+        _checklist = widget.checklist;
+      });
+    }
+  }
+
+  void _onItemChecked(Map<String, dynamic> data) {
+    if (mounted) {
+      if (data['item'].isChecked) {
+        widget.checklist.increaseCheckedItems();
+      } else {
+        widget.checklist.decreaseCheckedItems();
+      }
+      setState(() {
+        _checklist = widget.checklist;
+      });
+    }
+  }
+
+  void _onItemRemoved(Map<String, dynamic> data) {
+    if (mounted) {
+      widget.checklist.removeItem(data['item'].id);
+      setState(() {
+        _checklist = widget.checklist;
+      });
+    }
+  }
+
   void _sortList() {
-    this._items.sort((ChecklistItem a, ChecklistItem b) => a.title.compareTo(b.title));
+    _checklist.items.sort((ChecklistItem a, ChecklistItem b) => a.title.compareTo(b.title));
   }
 }
