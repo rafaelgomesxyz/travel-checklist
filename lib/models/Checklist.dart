@@ -4,15 +4,17 @@ class Checklist {
   int _id = 0;
   int _trip = 0;
   String _title = '';
+
   int _currentItems = 0;
   int _totalItems = 0;
 
   final List<ChecklistItem> _items = [];
 
-  Checklist(int id, int trip) {
-    this._id = id;
-    this._trip = trip;
-  }
+  Checklist();
+
+  set id(int id) => this._id = id;
+
+  set trip(int trip) => this._trip = trip;
 
   set title(String title) => this._title = title;
 
@@ -30,6 +32,14 @@ class Checklist {
 
   int get totalItems => this._totalItems;
 
+  void increaseCurrentItems() {
+    this._currentItems += 1;
+  }
+
+  void decreaseCurrentItems() {
+    this._currentItems -= 1;
+  }
+
   void addItem(ChecklistItem item) {
     this._items.add(item);
     this._totalItems += 1;
@@ -42,7 +52,7 @@ class Checklist {
   void removeItem(int id) {
     ChecklistItem item = this.getItem(id);
     if (item.isChecked) {
-      this._currentItems -= 1;
+      this.decreaseCurrentItems();
     }
     this._items.remove(item);
     this._totalItems -= 1;

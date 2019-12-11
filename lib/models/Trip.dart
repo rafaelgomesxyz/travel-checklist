@@ -8,9 +8,9 @@ class Trip {
 
   final List<Checklist> _checklists = [];
 
-  Trip(int id) {
-    this._id = id;
-  }
+  Trip();
+
+  set id(int id) => this._id = id;
 
   set title(String title) => this._title = title;
 

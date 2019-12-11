@@ -4,10 +4,11 @@ class ChecklistItem {
   String _title = '';
   bool _isChecked = false;
 
-  ChecklistItem(int id, int checklist) {
-    this._id = id;
-    this._checklist = checklist;
-  }
+  ChecklistItem();
+
+  set id(int id) => this._id = id;
+
+  set checklist(int checklist) => this._checklist = checklist;
 
   set title(String title) => this._title = title;
 
