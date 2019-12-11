@@ -1,43 +1,35 @@
-import 'package:travel_checklist/models/Streamable.dart';
-
 class ChecklistItem {
   int _id = 0;
-  bool _isChecked = false;
+  int _checklist = 0;
   String _title = '';
+  bool _isChecked = false;
 
-  final Streamable<bool> _stream = Streamable<bool>();
-
-  ChecklistItem(int id) {
+  ChecklistItem(int id, int checklist) {
     this._id = id;
+    this._checklist = checklist;
   }
-
-  int get id => this._id;
-
-  set isChecked(bool isChecked) {
-    this._isChecked = isChecked;
-    this._stream.emit(this._isChecked);
-  }
-
-  bool get isChecked => this._isChecked;
 
   set title(String title) => this._title = title;
 
+  set isChecked(bool isChecked) => this._isChecked = isChecked;
+
+  int get id => this._id;
+
+  int get checklist => this._checklist;
+
   String get title => this._title;
 
-  Streamable<bool> get stream => this._stream;
+  bool get isChecked => this._isChecked;
 
   void check() {
     this._isChecked = true;
-    this._stream.emit(this._isChecked);
   }
 
   void uncheck() {
     this._isChecked = false;
-    this._stream.emit(this._isChecked);
   }
 
   void toggle() {
     this._isChecked = !this._isChecked;
-    this._stream.emit(this._isChecked);
   }
 }

@@ -1,45 +1,32 @@
 import 'package:travel_checklist/models/Checklist.dart';
-import 'package:travel_checklist/models/Progress.dart';
 
 class Trip {
   int _id = 0;
   String _title = '';
   int _timestamp = 0;
   String _destination = '';
+
   final List<Checklist> _checklists = [];
-  final Progress _progress = Progress(0, 0);
 
   Trip(int id) {
     this._id = id;
   }
 
-  int get id => this._id;
-
   set title(String title) => this._title = title;
-
-  String get title => this._title;
 
   set timestamp(int timestamp) => this._timestamp = timestamp;
 
-  int get timestamp => this._timestamp;
-
   set destination(String destination) => this._destination = destination;
+
+  int get id => this._id;
+
+  String get title => this._title;
+
+  int get timestamp => this._timestamp;
 
   String get destination => this._destination;
 
-  Progress get progress => this._progress;
-
-  void _updateProgress(bool isItemChecked) {
-    if (isItemChecked) {
-      this._progress.increaseCurrent();
-    } else {
-      this._progress.decreaseCurrent();
-    }
-  }
-
   void addChecklist(Checklist checklist) {
-    checklist.stream.listen(this._updateProgress);
-    this._progress.total += checklist.progress.total;
     this._checklists.add(checklist);
   }
   
@@ -49,9 +36,6 @@ class Trip {
   
   void removeChecklist(int id) {
     Checklist checklist = this.getChecklist(id);
-    checklist.stream.close();
-    this._progress.current -= checklist.progress.current;
-    this._progress.total -= checklist.progress.total;
     this._checklists.remove(checklist);
   }
 }

@@ -1,42 +1,38 @@
 import 'package:travel_checklist/models/ChecklistItem.dart';
-import 'package:travel_checklist/models/Progress.dart';
-import 'package:travel_checklist/models/Streamable.dart';
 
 class Checklist {
   int _id = 0;
+  int _trip = 0;
   String _title = '';
+  int _currentItems = 0;
+  int _totalItems = 0;
+
   final List<ChecklistItem> _items = [];
-  final Progress _progress = Progress(0, 0);
 
-  final Streamable<bool> _stream = Streamable<bool>();
-
-  Checklist(int id) {
+  Checklist(int id, int trip) {
     this._id = id;
+    this._trip = trip;
   }
-
-  int get id => this._id;
 
   set title(String title) => this._title = title;
 
+  set currentItems(int currentItems) => this._currentItems = currentItems;
+
+  set totalItems(int totalItems) => this._totalItems = totalItems;
+
+  int get id => this._id;
+
+  int get trip => this._trip;
+
   String get title => this._title;
 
-  Progress get progress => this._progress;
+  int get currentItems => this._currentItems;
 
-  Streamable<bool> get stream => this._stream;
-
-  void _updateProgress(bool isItemChecked) {
-    if (isItemChecked) {
-      this._progress.increaseCurrent();
-    } else {
-      this._progress.decreaseCurrent();
-    }
-    this._stream.emit(isItemChecked);
-  }
+  int get totalItems => this._totalItems;
 
   void addItem(ChecklistItem item) {
-    item.stream.listen(this._updateProgress);
-    this._progress.increaseTotal();
     this._items.add(item);
+    this._totalItems += 1;
   }
 
   ChecklistItem getItem(int id) {
@@ -45,11 +41,10 @@ class Checklist {
 
   void removeItem(int id) {
     ChecklistItem item = this.getItem(id);
-    item.stream.close();
     if (item.isChecked) {
-      this._progress.decreaseCurrent();
+      this._currentItems -= 1;
     }
-    this._progress.decreaseTotal();
     this._items.remove(item);
+    this._totalItems -= 1;
   }
 }
