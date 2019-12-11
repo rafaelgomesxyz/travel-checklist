@@ -34,9 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               margin: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
             ),
-            SizedBox(
+            Expanded(
               child: TripList(numToShow: 3),
-              height: 260.0,
             ),
             Container(
               child: ButtonTheme(

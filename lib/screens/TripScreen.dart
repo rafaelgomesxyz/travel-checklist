@@ -74,9 +74,8 @@ class _TripScreenState extends State<TripScreen> {
             ),
             margin: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
           ),
-          SizedBox(
+          Expanded(
             child: ChecklistList(trip: widget.trip.id),
-            height: 400.0,
           ),
         ],
         crossAxisAlignment: CrossAxisAlignment.start,

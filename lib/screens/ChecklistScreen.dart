@@ -42,9 +42,8 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
             ),
             margin: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
           ),
-          SizedBox(
+          Expanded(
             child: ChecklistItemList(checklist: widget.checklist.id),
-            height: 400.0,
           ),
         ],
         crossAxisAlignment: CrossAxisAlignment.start,
