@@ -34,8 +34,8 @@ class _TripListState extends State<TripList> {
     } else {
       _numToShow = 0;
     }
-    _tripAddedSubscription = _eDispatcher.listen(EventDispatcher.eventChecklistAdded, _loadTrips);
-    _tripRemovedSubscription = _eDispatcher.listen(EventDispatcher.eventChecklistRemoved, _loadTrips);
+    _tripAddedSubscription = _eDispatcher.listen(EventDispatcher.eventTripAdded, _loadTrips);
+    _tripRemovedSubscription = _eDispatcher.listen(EventDispatcher.eventTripRemoved, _loadTrips);
     _loadTrips({});
   }
 
@@ -54,9 +54,6 @@ class _TripListState extends State<TripList> {
         child: ListView(
           children: _trips.map((Trip trip) => TripCard(trip: trip)).toList(),
           padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 75.0),
-          physics: _numToShow > 0
-            ? NeverScrollableScrollPhysics()
-            : AlwaysScrollableScrollPhysics(),
         ),
         onRefresh: () async {
           _loadTrips({});
