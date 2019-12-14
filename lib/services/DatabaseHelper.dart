@@ -67,11 +67,13 @@ $columnCoordinates VARCHAR(63)
   }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (newVersion == 2) {
-      await db.execute('''
+    if (oldVersion < 2) {
+      try {
+        await db.execute('''
 ALTER TABLE $tableChecklistItem
 ADD $columnCoordinates VARCHAR(63)
 ''');
+      } catch (err) {}
     }
   }
 
