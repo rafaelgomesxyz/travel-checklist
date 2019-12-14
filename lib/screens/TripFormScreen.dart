@@ -189,16 +189,16 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 icon: Icon(Icons.calendar_today),
                 label: Text('Selecionar Data'),
                 onPressed: () {
-                  DatePicker.showDatePicker(
+                  DatePicker.showDateTimePicker(
                     context,
-                    showTitleActions: true,
+                    currentTime: DateTime.now(),
+                    locale: LocaleType.pt,
                     onConfirm: (date) {
                       setState(() {
                         _timestampController.text = _dateFormat.format(date);
                       });
                     },
-                    currentTime: DateTime.now(),
-                    locale: LocaleType.pt
+                    showTitleActions: true,
                   );
                 },
               ),
