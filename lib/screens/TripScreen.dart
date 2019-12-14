@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/components/ChecklistList.dart';
 import 'package:travel_checklist/models/Trip.dart';
@@ -18,6 +19,7 @@ class TripScreen extends StatefulWidget {
 }
 
 class _TripScreenState extends State<TripScreen> {
+  DateFormat _dateFormat;
   Trip _trip;
 
   final _dbHelper = DatabaseHelper.instance;
@@ -26,6 +28,7 @@ class _TripScreenState extends State<TripScreen> {
   @override
   void initState() {
     super.initState();
+    _dateFormat = DateFormat.yMd('pt_BR').add_Hm();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
     setState(() {
       _trip = widget.trip;
@@ -53,12 +56,12 @@ class _TripScreenState extends State<TripScreen> {
             child: Row(
               children: <Widget> [
                 Text(
-                  'DATA',
+                  'DESTINO',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text('${date.toIso8601String()} (${timeago.format(date, locale: 'pt_BR', allowFromNow: true)})'),
+                Text(_trip.destination),
               ],
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
             ),
@@ -68,12 +71,12 @@ class _TripScreenState extends State<TripScreen> {
             child: Row(
               children: <Widget> [
                 Text(
-                  'DESTINO',
+                  'DATA',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(_trip.destination),
+                Text('${_dateFormat.format(date)} (${timeago.format(date, locale: 'pt_BR', allowFromNow: true)})'),
               ],
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
             ),
