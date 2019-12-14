@@ -10,8 +10,9 @@ import 'package:travel_checklist/secrets.dart';
 class ChecklistItemFormScreen extends StatefulWidget {
   final ChecklistItem item;
   final int checklist;
+  final String coordinates;
 
-  ChecklistItemFormScreen({ Key key, this.item, this.checklist }) : super(key: key);
+  ChecklistItemFormScreen({ Key key, this.item, this.checklist, this.coordinates }) : super(key: key);
 
   @override
   _ChecklistItemFormScreenState createState() => _ChecklistItemFormScreenState();
@@ -27,7 +28,7 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
   final _eDispatcher = EventDispatcher.instance;
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController _titleController = TextEditingController();
+  TextEditingController _nameController = TextEditingController();
 
   @override
   void initState() {
@@ -35,10 +36,11 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
     if (widget.item == null) {
       _title = 'Criar Item';
+      _coordinates = widget.coordinates;
     } else {
       _isCreating = false;
-      _title = 'Editar Item - ${widget.item.title}';
-      _titleController.text = widget.item.title;
+      _title = 'Editar Item - ${widget.item.name}';
+      _nameController.text = widget.item.name;
       _coordinates = widget.item.coordinates;
       _isPlace = _coordinates.isNotEmpty;
     }
@@ -68,7 +70,7 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
               ),
               TextFormField(
                 enabled: !_isPlace,
-                controller: _titleController,
+                controller: _nameController,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(fontSize: 15.0),
                   labelStyle: TextStyle(color: Colors.blueAccent),
@@ -96,7 +98,7 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
                     onChanged: (bool isChecked) {
                       setState(() {
                         _isPlace = isChecked;
-                        _titleController.text = '';
+                        _nameController.text = '';
                       });
                     },
                     value: _isPlace,
@@ -134,7 +136,7 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
                       latitude = result.latLng.latitude;
                       longitude = result.latLng.longitude;
                       setState(() {
-                        _titleController.text = result.name;
+                        _nameController.text = result.name;
                         _coordinates = '$latitude,$longitude';
                       });
                     }
@@ -169,15 +171,13 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
             if (_isCreating) {
               ChecklistItem item = ChecklistItem();
               item.checklist = widget.checklist;
-              item.title = _titleController.text;
+              item.name = _nameController.text;
               item.coordinates = _coordinates;
-              item.isPlace = _isPlace;
               item.id = await _dbHelper.insertChecklistItem(item);
               _eDispatcher.emit(EventDispatcher.eventChecklistItemAdded, { 'item': item});
             } else {
-              widget.item.title = _titleController.text;
+              widget.item.name = _nameController.text;
               widget.item.coordinates = _coordinates;
-              widget.item.isPlace = _isPlace;
               await _dbHelper.updateChecklistItem(widget.item);
             }
             Navigator.pop(context);

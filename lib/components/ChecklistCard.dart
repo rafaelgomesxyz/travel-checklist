@@ -4,8 +4,9 @@ import 'package:travel_checklist/screens/ChecklistScreen.dart';
 
 class ChecklistCard extends StatefulWidget {
   final Checklist checklist;
+  final String coordinates;
 
-  ChecklistCard({ Key key, this.checklist }) : super(key: key);
+  ChecklistCard({ Key key, this.checklist, this.coordinates }) : super(key: key);
 
   @override
   _ChecklistCardState createState() => _ChecklistCardState();
@@ -48,7 +49,7 @@ class _ChecklistCardState extends State<ChecklistCard> {
               child: Row(
                 children: <Widget> [
                   Text(
-                    _checklist.title,
+                    _checklist.name,
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -70,7 +71,7 @@ class _ChecklistCardState extends State<ChecklistCard> {
         margin: EdgeInsets.all(10.0),
       ),
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ChecklistScreen(checklist: widget.checklist )));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ChecklistScreen(checklist: widget.checklist, coordinates: widget.coordinates)));
       },
     );
   }

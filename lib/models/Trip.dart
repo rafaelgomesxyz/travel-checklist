@@ -2,9 +2,10 @@ import 'package:travel_checklist/models/Checklist.dart';
 
 class Trip {
   int id = 0;
-  String title = '';
-  int timestamp = 0;
+  String name = '';
   String destination = '';
+  String destinationCoordinates = '';
+  int timestamp = 0;
   List<Checklist> checklists = [];
 
   Trip();

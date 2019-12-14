@@ -33,7 +33,7 @@ class _TripCardState extends State<TripCard> {
               child: Row(
                 children: <Widget> [
                   Text(
-                    _trip.title,
+                    _trip.name,
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,

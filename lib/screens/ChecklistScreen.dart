@@ -10,8 +10,9 @@ import 'package:travel_checklist/services/EventDispatcher.dart';
 
 class ChecklistScreen extends StatefulWidget {
   final Checklist checklist;
+  final String coordinates;
 
-  ChecklistScreen({ Key key, this.checklist }) : super(key: key);
+  ChecklistScreen({ Key key, this.checklist, this.coordinates }) : super(key: key);
 
   @override
   _ChecklistScreenState createState() => _ChecklistScreenState();
@@ -36,7 +37,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_checklist.title),
+        title: Text(_checklist.name),
         actions: <Widget> [
           IconButton(
             icon: Icon(Icons.refresh),
@@ -111,7 +112,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
             label: 'Criar Item',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ChecklistItemFormScreen(checklist: widget.checklist.id)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ChecklistItemFormScreen(checklist: widget.checklist.id, coordinates: widget.coordinates)));
             },
           ),
         ],

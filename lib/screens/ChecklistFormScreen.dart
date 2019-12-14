@@ -22,7 +22,7 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
   final _eDispatcher = EventDispatcher.instance;
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController _titleController = TextEditingController();
+  TextEditingController _nameController = TextEditingController();
 
   @override
   void initState() {
@@ -32,8 +32,8 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
       _title = 'Criar Checklist';
     } else {
       _isCreating = false;
-      _title = 'Editar Checklist - ${widget.checklist.title}';
-      _titleController.text = widget.checklist.title;
+      _title = 'Editar Checklist - ${widget.checklist.name}';
+      _nameController.text = widget.checklist.name;
     }
   }
 
@@ -60,11 +60,11 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
                 size: 50,
               ),
               TextFormField(
-                controller: _titleController,
+                controller: _nameController,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(fontSize: 15.0),
                   labelStyle: TextStyle(color: Colors.blueAccent),
-                  labelText: 'Título',
+                  labelText: 'Nome',
                 ),
                 keyboardType: TextInputType.text,
                 style: TextStyle(
@@ -74,7 +74,7 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
                 textAlign: TextAlign.left,
                 validator: (value) {
                   if (value.isEmpty) {
-                    return 'O título não pode ser vazio!';
+                    return 'O nome não pode ser vazio!';
                   }
                 },
               ),
@@ -105,11 +105,11 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
             if (_isCreating) {
               Checklist checklist = Checklist();
               checklist.trip = widget.trip;
-              checklist.title = _titleController.text;
+              checklist.name = _nameController.text;
               checklist.id = await _dbHelper.insertChecklist(checklist);
               _eDispatcher.emit(EventDispatcher.eventChecklistAdded, { 'checklist': checklist});
             } else {
-              widget.checklist.title = _titleController.text;
+              widget.checklist.name = _nameController.text;
               await _dbHelper.updateChecklist(widget.checklist);
             }
             Navigator.pop(context);

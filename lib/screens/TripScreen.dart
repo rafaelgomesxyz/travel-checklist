@@ -37,7 +37,7 @@ class _TripScreenState extends State<TripScreen> {
     DateTime date = DateTime.fromMillisecondsSinceEpoch(_trip.timestamp);
     return Scaffold(
       appBar: AppBar(
-        title: Text(_trip.title),
+        title: Text(_trip.name),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.refresh),

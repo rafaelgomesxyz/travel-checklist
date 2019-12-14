@@ -3,7 +3,7 @@ import 'package:travel_checklist/models/ChecklistItem.dart';
 class Checklist {
   int id = 0;
   int trip = 0;
-  String title = '';
+  String name = '';
   int checkedItems = 0;
   int totalItems = 0;
   List<ChecklistItem> items = [];

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:place_picker/place_picker.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
+import 'package:travel_checklist/secrets.dart';
 
 class TripFormScreen extends StatefulWidget {
   final Trip trip;
@@ -18,15 +21,16 @@ class TripFormScreen extends StatefulWidget {
 class _TripFormScreenState extends State<TripFormScreen> {
   bool _isCreating = true;
   String _title = '';
+  String _destinationCoordinates = '';
   String _template = '';
 
   final _dbHelper = DatabaseHelper.instance;
   final _eDispatcher = EventDispatcher.instance;
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController _titleController = TextEditingController();
-  TextEditingController _timestampController = TextEditingController();
+  TextEditingController _nameController = TextEditingController();
   TextEditingController _destinationController = TextEditingController();
+  TextEditingController _timestampController = TextEditingController();
 
   @override
   void initState() {
@@ -42,10 +46,11 @@ class _TripFormScreenState extends State<TripFormScreen> {
       }
     } else {
       _isCreating = false;
-      _title = 'Editar Viagem - ${widget.trip.title}';
-      _titleController.text = widget.trip.title;
-      _timestampController.text = DateTime.fromMillisecondsSinceEpoch(widget.trip.timestamp).toIso8601String();
+      _title = 'Editar Viagem - ${widget.trip.name}';
+      _nameController.text = widget.trip.name;
       _destinationController.text = widget.trip.destination;
+      _destinationCoordinates = widget.trip.destinationCoordinates;
+      _timestampController.text = DateTime.fromMillisecondsSinceEpoch(widget.trip.timestamp).toIso8601String();
     }
   }
 
@@ -78,11 +83,11 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 size: 50,
               ),
               TextFormField(
-                controller: _titleController,
+                controller: _nameController,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(fontSize: 15.0),
                   labelStyle: TextStyle(color: Colors.blueAccent),
-                  labelText: 'Título',
+                  labelText: 'Nome',
                 ),
                 keyboardType: TextInputType.text,
                 style: TextStyle(
@@ -92,7 +97,56 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 textAlign: TextAlign.left,
                 validator: (value) {
                   if (value.isEmpty) {
-                    return 'O título não pode ser vazio!';
+                    return 'O nome não pode ser vazio!';
+                  }
+                },
+              ),
+              TextFormField(
+                enabled: false,
+                controller: _destinationController,
+                decoration: InputDecoration(
+                  errorStyle: TextStyle(fontSize: 15.0),
+                  labelStyle: TextStyle(color: Colors.blueAccent),
+                  labelText: 'Destino',
+                ),
+                keyboardType: TextInputType.text,
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                  fontSize: 20.0,
+                ),
+                textAlign: TextAlign.left,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Selecione um destino!';
+                  }
+                },
+              ),
+              FlatButton.icon(
+                color: Colors.blueAccent,
+                textColor: Colors.white,
+                icon: Icon(Icons.place),
+                label: Text('Selecionar Destino'),
+                onPressed: () async {
+                  double latitude = 0.0;
+                  double longitude = 0.0;
+                  if (_destinationCoordinates.isNotEmpty) {
+                    List<String> latlng = _destinationCoordinates.split(',');
+                    latitude = double.parse(latlng[0]);
+                    longitude = double.parse(latlng[1]);
+                  }
+                  LocationResult result = await Navigator.push(context, MaterialPageRoute(
+                    builder: (_context) => PlacePicker(
+                      googleMapsApiKey,
+                      displayLocation: _destinationCoordinates.isNotEmpty ? LatLng(latitude, longitude) : null,
+                    ),
+                  ));
+                  if (result != null) {
+                    latitude = result.latLng.latitude;
+                    longitude = result.latLng.longitude;
+                    setState(() {
+                      _destinationController.text = result.name;
+                      _destinationCoordinates = '$latitude,$longitude';
+                    });
                   }
                 },
               ),
@@ -115,7 +169,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 color: Colors.blueAccent,
                 textColor: Colors.white,
                 icon: Icon(Icons.calendar_today),
-                label: Text('Escolher Data'),
+                label: Text('Selecionar Data'),
                 onPressed: () {
                   DatePicker.showDatePicker(
                     context,
@@ -128,30 +182,6 @@ class _TripFormScreenState extends State<TripFormScreen> {
                     currentTime: DateTime.now(),
                     locale: LocaleType.pt
                   );
-                },
-              ),
-              TextFormField(
-                //enabled: false,
-                controller: _destinationController,
-                decoration: InputDecoration(
-                  errorStyle: TextStyle(fontSize: 15.0),
-                  labelStyle: TextStyle(color: Colors.blueAccent),
-                  labelText: 'Destino',
-                ),
-                keyboardType: TextInputType.text,
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 20.0,
-                ),
-                textAlign: TextAlign.left,
-              ),
-              FlatButton.icon(
-                color: Colors.blueAccent,
-                textColor: Colors.white,
-                icon: Icon(Icons.place),
-                label: Text('Escolher Destino'),
-                onPressed: () {
-                  // TODO: implement map
                 },
               ),
               _buildButton(),
@@ -180,19 +210,21 @@ class _TripFormScreenState extends State<TripFormScreen> {
           if (_formKey.currentState.validate()) {
             if (_isCreating) {
               Trip trip = Trip();
-              trip.title = _titleController.text;
+              trip.name = _nameController.text;
+              trip.destination = _destinationController.text;
+              trip.destinationCoordinates = _destinationCoordinates;
               trip.timestamp = DateTime
                 .parse(_timestampController.text)
                 .millisecondsSinceEpoch;
-              trip.destination = _destinationController.text;
               trip.id = await _dbHelper.insertTrip(trip);
               _eDispatcher.emit(EventDispatcher.eventTripAdded, { 'trip': trip});
             } else {
-              widget.trip.title = _titleController.text;
+              widget.trip.name = _nameController.text;
+              widget.trip.destination = _destinationController.text;
+              widget.trip.destinationCoordinates = _destinationCoordinates;
               widget.trip.timestamp = DateTime
                 .parse(_timestampController.text)
                 .millisecondsSinceEpoch;
-              widget.trip.destination = _destinationController.text;
               await _dbHelper.updateTrip(widget.trip);
             }
             Navigator.pop(context);

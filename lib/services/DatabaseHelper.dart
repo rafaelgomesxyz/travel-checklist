@@ -8,18 +8,45 @@ import 'package:travel_checklist/models/Trip.dart';
 
 class DatabaseHelper {
   static final _databaseName = 'database.db';
-  static final _databaseVersion = 2;
+  static final _databaseVersion = 1;
 
   static final tableChecklistItem = 'checklist_item';
   static final tableChecklist = 'checklist';
   static final tableTrip = 'trip';
 
   static final columnId = 'id';
-  static final columnTitle = 'title';
-  static final columnTimestamp = 'timestamp';
-  static final columnDestination = 'destination';
-  static final columnIsChecked = 'is_checked';
+  static final columnName = 'name';
   static final columnCoordinates = 'coordinates';
+  static final columnIsChecked = 'is_checked';
+  static final columnDestination = 'destination';
+  static final columnDestinationCoordinates = 'destination_coordinates';
+  static final columnTimestamp = 'timestamp';
+
+  static final schemaChecklistItem = '''
+    CREATE TABLE $tableChecklistItem (
+      $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
+      $tableChecklist INTEGER NOT NULL REFERENCES $tableChecklist ($columnId),
+      $columnName VARCHAR(255) NOT NULL,
+      $columnCoordinates VARCHAR(63),
+      $columnIsChecked TINYINT NOT NULL
+    )
+  ''';
+  static final schemaChecklist = '''
+    CREATE TABLE $tableChecklist (
+      $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
+      $tableTrip INTEGER NOT NULL REFERENCES $tableTrip ($columnId),
+      $columnName VARCHAR(255) NOT NULL
+    )
+  ''';
+  static final schemaTrip = '''
+    CREATE TABLE $tableTrip (
+      $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
+      $columnName VARCHAR(255) NOT NULL,
+      $columnDestination VARCHAR(255) NOT NULL,
+      $columnDestinationCoordinates VARCHAR(63) NOT NULL,
+      $columnTimestamp INTEGER NOT NULL
+    )
+  ''';
 
   DatabaseHelper._privateConstructor(); // Singleton
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
@@ -38,52 +65,22 @@ class DatabaseHelper {
     return await openDatabase(path,
       version: _databaseVersion,
       onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
     );
   }
 
   Future _onCreate(Database db, int version) async {
-    await db.execute('''
-CREATE TABLE $tableTrip (
-$columnId INTEGER PRIMARY KEY AUTOINCREMENT,
-$columnTitle VARCHAR(255) NOT NULL,
-$columnTimestamp INTEGER NOT NULL,
-$columnDestination VARCHAR(255) NOT NULL
-)''');
-    await db.execute('''
-CREATE TABLE $tableChecklist (
-$columnId INTEGER PRIMARY KEY AUTOINCREMENT,
-$tableTrip INTEGER NOT NULL REFERENCES $tableTrip ($columnId),
-$columnTitle VARCHAR(255) NOT NULL
-)''');
-    await db.execute('''
-CREATE TABLE $tableChecklistItem (
-$columnId INTEGER PRIMARY KEY AUTOINCREMENT,
-$tableChecklist INTEGER NOT NULL REFERENCES $tableChecklist ($columnId),
-$columnTitle VARCHAR(255) NOT NULL,
-$columnIsChecked TINYINT NOT NULL,
-$columnCoordinates VARCHAR(63)
-)''');
-  }
-
-  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      try {
-        await db.execute('''
-ALTER TABLE $tableChecklistItem
-ADD $columnCoordinates VARCHAR(63)
-''');
-      } catch (err) {}
-    }
+    await db.execute(schemaTrip);
+    await db.execute(schemaChecklist);
+    await db.execute(schemaChecklistItem);
   }
 
   Future<int> insertChecklistItem(ChecklistItem item) async {
     Database db = await instance.database;
     Map<String, dynamic> row = {};
     row[tableChecklist] = item.checklist;
-    row[columnTitle] = item.title;
-    row[columnIsChecked] = item.isChecked;
+    row[columnName] = item.name;
     row[columnCoordinates] = item.coordinates;
+    row[columnIsChecked] = item.isChecked;
     return await db.insert(tableChecklistItem, row);
   }
 
@@ -91,41 +88,43 @@ ADD $columnCoordinates VARCHAR(63)
     Database db = await instance.database;
     Map<String, dynamic> row = {};
     row[tableTrip] = checklist.trip;
-    row[columnTitle] = checklist.title;
+    row[columnName] = checklist.name;
     return await db.insert(tableChecklist, row);
   }
 
   Future<int> insertTrip(Trip trip) async {
     Database db = await instance.database;
     Map<String, dynamic> row = {};
-    row[columnTitle] = trip.title;
-    row[columnTimestamp] = trip.timestamp;
+    row[columnName] = trip.name;
     row[columnDestination] = trip.destination;
+    row[columnDestinationCoordinates] = trip.destinationCoordinates;
+    row[columnTimestamp] = trip.timestamp;
     return await db.insert(tableTrip, row);
   }
 
   Future<int> updateChecklistItem(ChecklistItem item) async {
     Database db = await instance.database;
     Map<String, dynamic> row = {};
-    row[columnTitle] = item.title;
-    row[columnIsChecked] = item.isChecked;
+    row[columnName] = item.name;
     row[columnCoordinates] = item.coordinates;
+    row[columnIsChecked] = item.isChecked;
     return await db.update(tableChecklistItem, row, where: '$columnId = ?', whereArgs: [item.id]);
   }
 
   Future<int> updateChecklist(Checklist checklist) async {
     Database db = await instance.database;
     Map<String, dynamic> row = {};
-    row[columnTitle] = checklist.title;
+    row[columnName] = checklist.name;
     return await db.update(tableChecklist, row, where: '$columnId = ?', whereArgs: [checklist.id]);
   }
 
   Future<int> updateTrip(Trip trip) async {
     Database db = await instance.database;
     Map<String, dynamic> row = {};
-    row[columnTitle] = trip.title;
-    row[columnTimestamp] = trip.timestamp;
+    row[columnName] = trip.name;
     row[columnDestination] = trip.destination;
+    row[columnDestinationCoordinates] = trip.destinationCoordinates;
+    row[columnTimestamp] = trip.timestamp;
     return await db.update(tableTrip, row, where: '$columnId = ?', whereArgs: [trip.id]);
   }
 
@@ -137,10 +136,9 @@ ADD $columnCoordinates VARCHAR(63)
       ChecklistItem item = ChecklistItem();
       item.id = row[columnId];
       item.checklist = row[tableChecklist];
-      item.title = row[columnTitle];
-      item.isChecked = row[columnIsChecked] == 1;
+      item.name = row[columnName];
       item.coordinates = row[columnCoordinates] ?? '';
-      item.isPlace = item.coordinates.isNotEmpty;
+      item.isChecked = row[columnIsChecked] == 1;
       items.add(item);
     }
     return items;
@@ -154,7 +152,7 @@ ADD $columnCoordinates VARCHAR(63)
       Checklist checklist = Checklist();
       checklist.id = row[columnId];
       checklist.trip = row[tableTrip];
-      checklist.title = row[columnTitle];
+      checklist.name = row[columnName];
       checklist.checkedItems = Sqflite.firstIntValue(
         await db.rawQuery('SELECT COUNT(*) FROM $tableChecklistItem WHERE $tableChecklist = ${checklist.id} AND $columnIsChecked = 1')
       );
@@ -173,9 +171,10 @@ ADD $columnCoordinates VARCHAR(63)
     for (Map<String, dynamic> row in rows) {
       Trip trip = Trip();
       trip.id = row[columnId];
-      trip.title = row[columnTitle];
-      trip.timestamp = row[columnTimestamp];
+      trip.name = row[columnName];
       trip.destination = row[columnDestination];
+      trip.destinationCoordinates = row[columnDestinationCoordinates];
+      trip.timestamp = row[columnTimestamp];
       trips.add(trip);
     }
     return trips;

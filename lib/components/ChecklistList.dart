@@ -47,7 +47,7 @@ class _ChecklistListState extends State<ChecklistList> {
       _sortList();
       return RefreshIndicator(
         child: ListView(
-          children: _trip.checklists.map((Checklist checklist) => ChecklistCard(checklist: checklist)).toList(),
+          children: _trip.checklists.map((Checklist checklist) => ChecklistCard(checklist: checklist, coordinates: _trip.destinationCoordinates)).toList(),
           padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 75.0),
         ),
         onRefresh: () async {
@@ -99,6 +99,6 @@ class _ChecklistListState extends State<ChecklistList> {
   }
 
   void _sortList() {
-    _trip.checklists.sort((Checklist a, Checklist b) => a.title.compareTo(b.title));
+    _trip.checklists.sort((Checklist a, Checklist b) => a.name.compareTo(b.name));
   }
 }

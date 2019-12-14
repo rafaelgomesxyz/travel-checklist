@@ -123,7 +123,7 @@ class _ChecklistItemListState extends State<ChecklistItemList> {
       if (!a.isChecked && b.isChecked) {
         return -1;
       }
-      return a.title.compareTo(b.title);
+      return a.name.compareTo(b.name);
     });
   }
 }

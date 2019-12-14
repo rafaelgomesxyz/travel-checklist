@@ -49,7 +49,7 @@ class _ChecklistItemCardState extends State<ChecklistItemCard> {
               visible: _item.isPlace,
             ),
             Text(
-              _item.title,
+              _item.name,
               style: TextStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,
