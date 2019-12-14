@@ -36,72 +36,81 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Expanded(
               child: TripList(numToShow: 3),
+              flex: 1,
             ),
-            Container(
-              child: ButtonTheme(
-                minWidth: 100.0,
-                child: OutlineButton(
-                  child: Text('VER TODAS'),
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => TripListScreen(title: widget.title)));
-                  },
-                ),
+            Expanded(
+              child: Column(
+                children: <Widget> [
+                  Container(
+                    child: ButtonTheme(
+                      minWidth: 100.0,
+                      child: OutlineButton(
+                        child: Text('VER TODAS'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => TripListScreen(title: widget.title)));
+                        },
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                  ),
+                  Container(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      'CRIAR VIAGEM',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    margin: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
+                  ),
+                  Container(
+                    child: ButtonTheme(
+                      minWidth: 200.0,
+                      child: FlatButton.icon(
+                        color: Colors.blueAccent,
+                        textColor: Colors.white,
+                        icon: Icon(Icons.beach_access),
+                        label: Text('PRAIA'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'PRAIA')));
+                        },
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                  ),
+                  Container(
+                    child: ButtonTheme(
+                      minWidth: 200.0,
+                      child: FlatButton.icon(
+                        color: Colors.blueAccent,
+                        textColor: Colors.white,
+                        icon: Icon(Icons.local_florist),
+                        label: Text('CAMPO'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CAMPO')));
+                        },
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                  ),
+                  Container(
+                    child: ButtonTheme(
+                      minWidth: 200.0,
+                      child: FlatButton.icon(
+                        color: Colors.blueAccent,
+                        textColor: Colors.white,
+                        icon: Icon(Icons.location_city),
+                        label: Text('CIDADE'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CIDADE')));
+                        },
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                  ),
+                ],
               ),
-              alignment: Alignment.center,
-            ),
-            Container(
-              child: Text(
-                'CRIAR VIAGEM',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              margin: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
-            ),
-            Container(
-              child: ButtonTheme(
-                minWidth: 200.0,
-                child: FlatButton.icon(
-                  color: Colors.blueAccent,
-                  textColor: Colors.white,
-                  icon: Icon(Icons.beach_access),
-                  label: Text('PRAIA'),
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'PRAIA')));
-                  },
-                ),
-              ),
-              alignment: Alignment.center,
-            ),
-            Container(
-              child: ButtonTheme(
-                minWidth: 200.0,
-                child: FlatButton.icon(
-                  color: Colors.blueAccent,
-                  textColor: Colors.white,
-                  icon: Icon(Icons.local_florist),
-                  label: Text('CAMPO'),
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CAMPO')));
-                  },
-                ),
-              ),
-              alignment: Alignment.center,
-            ),
-            Container(
-              child: ButtonTheme(
-                minWidth: 200.0,
-                child: FlatButton.icon(
-                  color: Colors.blueAccent,
-                  textColor: Colors.white,
-                  icon: Icon(Icons.location_city),
-                  label: Text('CIDADE'),
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CIDADE')));
-                  },
-                ),
-              ),
-              alignment: Alignment.center,
+              flex: 1,
             ),
           ],
           crossAxisAlignment: CrossAxisAlignment.start,
