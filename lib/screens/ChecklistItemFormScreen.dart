@@ -178,21 +178,23 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
         ),
         color: Colors.blueAccent,
         onPressed: () async {
-          if (_isCreating) {
-            ChecklistItem item = ChecklistItem();
-            item.checklist = widget.checklist;
-            item.title = _titleController.text;
-            item.coordinates = _coordinatesController.text;
-            item.isPlace = _isPlace;
-            item.id = await _dbHelper.insertChecklistItem(item);
-            _eDispatcher.emit(EventDispatcher.eventChecklistItemAdded, { 'item': item });
-          } else {
-            widget.item.title = _titleController.text;
-            widget.item.coordinates = _coordinatesController.text;
-            widget.item.isPlace = _isPlace;
-            await _dbHelper.updateChecklistItem(widget.item);
+          if (_formKey.currentState.validate()) {
+            if (_isCreating) {
+              ChecklistItem item = ChecklistItem();
+              item.checklist = widget.checklist;
+              item.title = _titleController.text;
+              item.coordinates = _coordinatesController.text;
+              item.isPlace = _isPlace;
+              item.id = await _dbHelper.insertChecklistItem(item);
+              _eDispatcher.emit(EventDispatcher.eventChecklistItemAdded, { 'item': item});
+            } else {
+              widget.item.title = _titleController.text;
+              widget.item.coordinates = _coordinatesController.text;
+              widget.item.isPlace = _isPlace;
+              await _dbHelper.updateChecklistItem(widget.item);
+            }
+            Navigator.pop(context);
           }
-          Navigator.pop(context);
         },
       ),
       height: 50.0,

@@ -101,17 +101,19 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
         ),
         color: Colors.blueAccent,
         onPressed: () async {
-          if (_isCreating) {
-            Checklist checklist = Checklist();
-            checklist.trip = widget.trip;
-            checklist.title = _titleController.text;
-            checklist.id = await _dbHelper.insertChecklist(checklist);
-            _eDispatcher.emit(EventDispatcher.eventChecklistAdded, { 'checklist': checklist });
-          } else {
-            widget.checklist.title = _titleController.text;
-            await _dbHelper.updateChecklist(widget.checklist);
+          if (_formKey.currentState.validate()) {
+            if (_isCreating) {
+              Checklist checklist = Checklist();
+              checklist.trip = widget.trip;
+              checklist.title = _titleController.text;
+              checklist.id = await _dbHelper.insertChecklist(checklist);
+              _eDispatcher.emit(EventDispatcher.eventChecklistAdded, { 'checklist': checklist});
+            } else {
+              widget.checklist.title = _titleController.text;
+              await _dbHelper.updateChecklist(widget.checklist);
+            }
+            Navigator.pop(context);
           }
-          Navigator.pop(context);
         },
       ),
       height: 50.0,

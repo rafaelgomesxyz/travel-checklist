@@ -177,20 +177,26 @@ class _TripFormScreenState extends State<TripFormScreen> {
         ),
         color: Colors.blueAccent,
         onPressed: () async {
-          if (_isCreating) {
-            Trip trip = Trip();
-            trip.title = _titleController.text;
-            trip.timestamp = DateTime.parse(_timestampController.text).millisecondsSinceEpoch;
-            trip.destination = _destinationController.text;
-            trip.id = await _dbHelper.insertTrip(trip);
-            _eDispatcher.emit(EventDispatcher.eventTripAdded, { 'trip': trip });
-          } else {
-            widget.trip.title = _titleController.text;
-            widget.trip.timestamp = DateTime.parse(_timestampController.text).millisecondsSinceEpoch;
-            widget.trip.destination = _destinationController.text;
-            await _dbHelper.updateTrip(widget.trip);
+          if (_formKey.currentState.validate()) {
+            if (_isCreating) {
+              Trip trip = Trip();
+              trip.title = _titleController.text;
+              trip.timestamp = DateTime
+                .parse(_timestampController.text)
+                .millisecondsSinceEpoch;
+              trip.destination = _destinationController.text;
+              trip.id = await _dbHelper.insertTrip(trip);
+              _eDispatcher.emit(EventDispatcher.eventTripAdded, { 'trip': trip});
+            } else {
+              widget.trip.title = _titleController.text;
+              widget.trip.timestamp = DateTime
+                .parse(_timestampController.text)
+                .millisecondsSinceEpoch;
+              widget.trip.destination = _destinationController.text;
+              await _dbHelper.updateTrip(widget.trip);
+            }
+            Navigator.pop(context);
           }
-          Navigator.pop(context);
         },
       ),
       height: 50.0,
