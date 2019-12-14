@@ -3,6 +3,8 @@ class ChecklistItem {
   int checklist = 0;
   String title = '';
   bool isChecked = false;
+  String coordinates = '';
+  bool isPlace = false;
 
   ChecklistItem();
 

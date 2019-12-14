@@ -28,6 +28,7 @@ dependencies:
   sqflite: ^1.1.7
   path_provider: ^1.4.5
   flutter_datetime_picker: ^1.2.8
+  google_map_location_picker: ^2.1.2+1
 
 dev_dependencies:
   flutter_test:

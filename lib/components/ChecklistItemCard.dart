@@ -44,6 +44,10 @@ class _ChecklistItemCardState extends State<ChecklistItemCard> {
               },
               value: _item.isChecked,
             ),
+            Visibility(
+              child: Icon(Icons.location_on),
+              visible: _item.isPlace,
+            ),
             Text(
               _item.title,
               style: TextStyle(

@@ -8,7 +8,7 @@ import 'package:travel_checklist/models/Trip.dart';
 
 class DatabaseHelper {
   static final _databaseName = 'database.db';
-  static final _databaseVersion = 1;
+  static final _databaseVersion = 2;
 
   static final tableChecklistItem = 'checklist_item';
   static final tableChecklist = 'checklist';
@@ -19,6 +19,7 @@ class DatabaseHelper {
   static final columnTimestamp = 'timestamp';
   static final columnDestination = 'destination';
   static final columnIsChecked = 'is_checked';
+  static final columnCoordinates = 'coordinates';
 
   DatabaseHelper._privateConstructor(); // Singleton
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
@@ -36,7 +37,9 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, _databaseName);
     return await openDatabase(path,
       version: _databaseVersion,
-      onCreate: _onCreate);
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+    );
   }
 
   Future _onCreate(Database db, int version) async {
@@ -58,8 +61,18 @@ CREATE TABLE $tableChecklistItem (
 $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
 $tableChecklist INTEGER NOT NULL REFERENCES $tableChecklist ($columnId),
 $columnTitle VARCHAR(255) NOT NULL,
-$columnIsChecked TINYINT NOT NULL
+$columnIsChecked TINYINT NOT NULL,
+$columnCoordinates VARCHAR(63)
 )''');
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (newVersion == 2) {
+      await db.execute('''
+ALTER TABLE $tableChecklistItem
+ADD $columnCoordinates VARCHAR(63)
+''');
+    }
   }
 
   Future<int> insertChecklistItem(ChecklistItem item) async {
@@ -68,6 +81,7 @@ $columnIsChecked TINYINT NOT NULL
     row[tableChecklist] = item.checklist;
     row[columnTitle] = item.title;
     row[columnIsChecked] = item.isChecked;
+    row[columnCoordinates] = item.coordinates;
     return await db.insert(tableChecklistItem, row);
   }
 
@@ -93,6 +107,7 @@ $columnIsChecked TINYINT NOT NULL
     Map<String, dynamic> row = {};
     row[columnTitle] = item.title;
     row[columnIsChecked] = item.isChecked;
+    row[columnCoordinates] = item.coordinates;
     return await db.update(tableChecklistItem, row, where: '$columnId = ?', whereArgs: [item.id]);
   }
 
@@ -122,6 +137,8 @@ $columnIsChecked TINYINT NOT NULL
       item.checklist = row[tableChecklist];
       item.title = row[columnTitle];
       item.isChecked = row[columnIsChecked] == 1;
+      item.coordinates = row[columnCoordinates] ?? '';
+      item.isPlace = item.coordinates.isNotEmpty;
       items.add(item);
     }
     return items;
