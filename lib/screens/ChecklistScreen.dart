@@ -38,8 +38,8 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     _checklistEditedSubscription.cancel();
+    super.dispose();
   }
 
   @override

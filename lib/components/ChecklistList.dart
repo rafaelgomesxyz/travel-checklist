@@ -36,9 +36,9 @@ class _ChecklistListState extends State<ChecklistList> {
 
   @override
   void dispose() {
-    super.dispose();
     _checklistAddedSubscription.cancel();
     _checklistRemovedSubscription.cancel();
+    super.dispose();
   }
 
   @override

@@ -41,9 +41,9 @@ class _TripListState extends State<TripList> {
 
   @override
   void dispose() {
-    super.dispose();
     _tripAddedSubscription.cancel();
     _tripRemovedSubscription.cancel();
+    super.dispose();
   }
 
   @override
