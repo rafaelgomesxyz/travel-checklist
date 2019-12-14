@@ -30,29 +30,34 @@ class _TripCardState extends State<TripCard> {
         child: Column(
           children: <Widget> [
             Container(
-              child: Row(
-                children: <Widget> [
-                  Text(
-                    _trip.name,
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    timeago.format(DateTime.fromMillisecondsSinceEpoch(_trip.timestamp), locale: 'pt_BR', allowFromNow: true),
-                  ),
-                ],
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Text(
+                _trip.name,
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 0.0),
             ),
             Container(
               child: Row(
                 children: <Widget> [
-                  Icon(Icons.flight),
-                  Text(_trip.destination),
+                  Row(
+                    children: <Widget> [
+                      Icon(Icons.flight),
+                      Text(_trip.destination),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget> [
+                      Text(
+                        timeago.format(DateTime.fromMillisecondsSinceEpoch(_trip.timestamp), locale: 'pt_BR', allowFromNow: true),
+                      ),
+                      Icon(Icons.access_time),
+                    ],
+                  ),
                 ],
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
               ),
               padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
             ),
