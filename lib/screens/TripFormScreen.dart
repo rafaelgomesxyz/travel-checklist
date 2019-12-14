@@ -189,7 +189,6 @@ class _TripFormScreenState extends State<TripFormScreen> {
             widget.trip.timestamp = DateTime.parse(_timestampController.text).millisecondsSinceEpoch;
             widget.trip.destination = _destinationController.text;
             await _dbHelper.updateTrip(widget.trip);
-            _eDispatcher.emit('${EventDispatcher.eventTripEdited}_${widget.trip.id}', { 'trip': widget.trip });
           }
           Navigator.pop(context);
         },

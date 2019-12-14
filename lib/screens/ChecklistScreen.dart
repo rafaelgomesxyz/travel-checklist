@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -21,8 +20,6 @@ class ChecklistScreen extends StatefulWidget {
 class _ChecklistScreenState extends State<ChecklistScreen> {
   Checklist _checklist;
 
-  StreamSubscription _checklistEditedSubscription;
-
   final _dbHelper = DatabaseHelper.instance;
   final _eDispatcher = EventDispatcher.instance;
 
@@ -30,16 +27,9 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
   void initState() {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
-    _checklistEditedSubscription = _eDispatcher.listen('${EventDispatcher.eventChecklistEdited}_${widget.checklist.id}', _onChecklistEdited);
     setState(() {
       _checklist = widget.checklist;
     });
-  }
-
-  @override
-  void dispose() {
-    _checklistEditedSubscription.cancel();
-    super.dispose();
   }
 
   @override
@@ -108,8 +98,11 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
             child: Icon(Icons.edit),
             label: 'Editar Checklist',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ChecklistFormScreen(checklist: widget.checklist)));
+            onTap: () async {
+              await Navigator.push(context, MaterialPageRoute(builder: (context) => ChecklistFormScreen(checklist: widget.checklist)));
+              setState(() {
+                _checklist = widget.checklist;
+              });
             },
           ),
           SpeedDialChild(
@@ -124,13 +117,5 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
         ],
       ),
     );
-  }
-
-  void _onChecklistEdited(Map<String, dynamic> data) {
-    if (mounted) {
-      setState(() {
-        _checklist = widget.checklist;
-      });
-    }
   }
 }

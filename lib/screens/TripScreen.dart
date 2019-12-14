@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -22,8 +20,6 @@ class TripScreen extends StatefulWidget {
 class _TripScreenState extends State<TripScreen> {
   Trip _trip;
 
-  StreamSubscription _tripEditedSubscription;
-
   final _dbHelper = DatabaseHelper.instance;
   final _eDispatcher = EventDispatcher.instance;
 
@@ -31,16 +27,9 @@ class _TripScreenState extends State<TripScreen> {
   void initState() {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
-    _tripEditedSubscription = _eDispatcher.listen('${EventDispatcher.eventTripEdited}_${widget.trip.id}', _onTripEdited);
     setState(() {
       _trip = widget.trip;
     });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _tripEditedSubscription.cancel();
   }
 
   @override
@@ -140,8 +129,11 @@ class _TripScreenState extends State<TripScreen> {
             child: Icon(Icons.edit),
             label: 'Editar Viagem',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(trip: widget.trip)));
+            onTap: () async {
+              await Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(trip: widget.trip)));
+              setState(() {
+                _trip = widget.trip;
+              });
             },
           ),
           SpeedDialChild(
@@ -156,13 +148,5 @@ class _TripScreenState extends State<TripScreen> {
         ],
       ),
     );
-  }
-
-  void _onTripEdited(Map<String, dynamic> data) {
-    if (mounted) {
-      setState(() {
-        _trip = widget.trip;
-      });
-    }
   }
 }

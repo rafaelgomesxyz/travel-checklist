@@ -110,7 +110,6 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
           } else {
             widget.checklist.title = _titleController.text;
             await _dbHelper.updateChecklist(widget.checklist);
-            _eDispatcher.emit('${EventDispatcher.eventChecklistEdited}_${widget.checklist.id}', { 'item': widget.checklist });
           }
           Navigator.pop(context);
         },

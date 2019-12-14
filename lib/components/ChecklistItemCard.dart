@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:travel_checklist/models/ChecklistItem.dart';
 import 'package:travel_checklist/screens/ChecklistItemFormScreen.dart';
@@ -17,27 +16,15 @@ class ChecklistItemCard extends StatefulWidget {
 class _ChecklistItemCardState extends State<ChecklistItemCard> {
   ChecklistItem _item;
 
-  StreamSubscription _itemEditedSubscription;
-  StreamSubscription _itemCheckedSubscription;
-
   final _dbHelper = DatabaseHelper.instance;
   final _eDispatcher = EventDispatcher.instance;
 
   @override
   void initState() {
     super.initState();
-    _itemEditedSubscription = _eDispatcher.listen('${EventDispatcher.eventChecklistItemEdited}_${widget.item.id}', _onItemEdited);
-    _itemCheckedSubscription = _eDispatcher.listen('${EventDispatcher.eventChecklistItemChecked}_${widget.item.id}', _onItemChecked);
     setState(() {
       _item = widget.item;
     });
-  }
-
-  @override
-  void dispose() {
-    _itemEditedSubscription.cancel();
-    _itemCheckedSubscription.cancel();
-    super.dispose();
   }
 
   @override
@@ -77,26 +64,12 @@ class _ChecklistItemCardState extends State<ChecklistItemCard> {
     );
   }
 
-  void _onItemEdited(Map<String, dynamic> data) {
-    if (mounted) {
-      setState(() {
-        _item = data['item'];
-      });
-    }
-  }
-
-  void _onItemChecked(Map<String, dynamic> data) {
-    if (mounted) {
-      setState(() {
-        _item = data['item'];
-      });
-    }
-  }
-
   void _updateChecked() async {
     await _dbHelper.updateChecklistItem(widget.item);
     _eDispatcher.emit(EventDispatcher.eventChecklistItemChecked, { 'item': widget.item });
-    _eDispatcher.emit('${EventDispatcher.eventChecklistItemChecked}_${widget.item.id}', { 'item': widget.item });
+    setState(() {
+      _item = widget.item;
+    });
   }
 
   void _openItemMenu() {
@@ -113,6 +86,9 @@ class _ChecklistItemCardState extends State<ChecklistItemCard> {
             onPressed: () async {
               await Navigator.push(_context, MaterialPageRoute(builder: (_context) => ChecklistItemFormScreen(item: widget.item)));
               Navigator.pop(_context);
+              setState(() {
+                _item = widget.item;
+              });
             },
             padding: EdgeInsets.all(0.0),
           ),
