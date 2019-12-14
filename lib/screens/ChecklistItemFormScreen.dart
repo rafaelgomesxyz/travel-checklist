@@ -47,6 +47,12 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
   }
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -69,7 +75,6 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
                 size: 50,
               ),
               TextFormField(
-                enabled: !_isPlace,
                 controller: _nameController,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(fontSize: 15.0),
@@ -90,6 +95,7 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
                       return 'O nome não pode ser vazio!';
                     }
                   }
+                  return null;
                 },
               ),
               Row(

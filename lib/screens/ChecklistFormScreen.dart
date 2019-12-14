@@ -38,6 +38,12 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
   }
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -76,6 +82,7 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
                   if (value.isEmpty) {
                     return 'O nome não pode ser vazio!';
                   }
+                  return null;
                 },
               ),
               _buildButton(),

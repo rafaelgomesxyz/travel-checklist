@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:place_picker/place_picker.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/models/Trip.dart';
@@ -19,6 +20,7 @@ class TripFormScreen extends StatefulWidget {
 }
 
 class _TripFormScreenState extends State<TripFormScreen> {
+  DateFormat _dateFormat;
   bool _isCreating = true;
   String _title = '';
   String _destinationCoordinates = '';
@@ -36,6 +38,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
   void initState() {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
+    _dateFormat = DateFormat.yMd('pt_BR').add_Hm();
     if (widget.trip == null) {
       if (widget.template != null) {
         _template = widget.template;
@@ -50,12 +53,14 @@ class _TripFormScreenState extends State<TripFormScreen> {
       _nameController.text = widget.trip.name;
       _destinationController.text = widget.trip.destination;
       _destinationCoordinates = widget.trip.destinationCoordinates;
-      _timestampController.text = DateTime.fromMillisecondsSinceEpoch(widget.trip.timestamp).toIso8601String();
+      _timestampController.text = _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(widget.trip.timestamp));
     }
   }
 
   @override
   void dispose() {
+    _nameController.dispose();
+    _destinationController.dispose();
     _timestampController.dispose();
     super.dispose();
   }
@@ -99,10 +104,10 @@ class _TripFormScreenState extends State<TripFormScreen> {
                   if (value.isEmpty) {
                     return 'O nome não pode ser vazio!';
                   }
+                  return null;
                 },
               ),
               TextFormField(
-                enabled: false,
                 controller: _destinationController,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(fontSize: 15.0),
@@ -119,6 +124,10 @@ class _TripFormScreenState extends State<TripFormScreen> {
                   if (value.isEmpty) {
                     return 'Selecione um destino!';
                   }
+                  if (_destinationCoordinates.isEmpty) {
+                    return 'Destino inválido!';
+                  }
+                  return null;
                 },
               ),
               FlatButton.icon(
@@ -150,19 +159,29 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 },
               ),
               TextFormField(
-                enabled: false,
                 controller: _timestampController,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(fontSize: 15.0),
                   labelStyle: TextStyle(color: Colors.blueAccent),
                   labelText: 'Data',
                 ),
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
                 style: TextStyle(
                   color: Colors.blueAccent,
                   fontSize: 20.0,
                 ),
                 textAlign: TextAlign.left,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Selecione uma data!';
+                  }
+                  try {
+                    _dateFormat.parse(_timestampController.text);
+                  } catch (err) {
+                    return 'Data inválida!';
+                  }
+                  return null;
+                },
               ),
               FlatButton.icon(
                 color: Colors.blueAccent,
@@ -175,7 +194,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
                     showTitleActions: true,
                     onConfirm: (date) {
                       setState(() {
-                        _timestampController.text = date.toIso8601String();
+                        _timestampController.text = _dateFormat.format(date);
                       });
                     },
                     currentTime: DateTime.now(),
@@ -212,7 +231,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
               trip.name = _nameController.text;
               trip.destination = _destinationController.text;
               trip.destinationCoordinates = _destinationCoordinates;
-              trip.timestamp = DateTime
+              trip.timestamp = _dateFormat
                 .parse(_timestampController.text)
                 .millisecondsSinceEpoch;
               trip.id = await _dbHelper.insertTrip(trip);
@@ -221,7 +240,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
               widget.trip.name = _nameController.text;
               widget.trip.destination = _destinationController.text;
               widget.trip.destinationCoordinates = _destinationCoordinates;
-              widget.trip.timestamp = DateTime
+              widget.trip.timestamp = _dateFormat
                 .parse(_timestampController.text)
                 .millisecondsSinceEpoch;
               await _dbHelper.updateTrip(widget.trip);

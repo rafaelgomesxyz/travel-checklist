@@ -29,6 +29,7 @@ dependencies:
   path_provider: ^1.4.5
   flutter_datetime_picker: ^1.2.8
   place_picker: ^0.9.11
+  intl: ^0.16.0
 
 dev_dependencies:
   flutter_test:
