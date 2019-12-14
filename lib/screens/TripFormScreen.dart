@@ -67,6 +67,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
     return Scaffold(
       appBar: AppBar(
         title: Text(_title),
@@ -191,8 +192,9 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 onPressed: () {
                   DatePicker.showDateTimePicker(
                     context,
-                    currentTime: DateTime.now(),
+                    currentTime: now,
                     locale: LocaleType.pt,
+                    minTime: now.subtract(Duration(seconds: 1)),
                     onConfirm: (date) {
                       setState(() {
                         _timestampController.text = _dateFormat.format(date);
