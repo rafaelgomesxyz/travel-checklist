@@ -3,9 +3,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:place_picker/place_picker.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/models/ChecklistItem.dart';
+import 'package:travel_checklist/screens/MapScreen.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
-import 'package:travel_checklist/secrets.dart';
 
 class ChecklistItemFormScreen extends StatefulWidget {
   final ChecklistItem item;
@@ -127,9 +127,8 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
                       longitude = double.parse(latlng[1]);
                     }
                     LocationResult result = await Navigator.push(context, MaterialPageRoute(
-                      builder: (_context) => PlacePicker(
-                        googleMapsApiKey,
-                        displayLocation: _isPlace && _coordinates.isNotEmpty ? LatLng(latitude, longitude) : null,
+                      builder: (_context) => MapScreen(
+                        initialLocation: _isPlace && _coordinates.isNotEmpty ? LatLng(latitude, longitude) : null,
                       ),
                     ));
                     if (result != null) {
