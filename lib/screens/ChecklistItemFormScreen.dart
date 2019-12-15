@@ -35,8 +35,8 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
   void initState() {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
-    _isPlace = widget.checklist.forPlaces;
     if (widget.item == null) {
+      _isPlace = widget.checklist.forPlaces;
       _title = 'Criar Item';
       if (_isPlace) {
         _coordinates = widget.coordinates;
@@ -45,9 +45,8 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
       _isCreating = false;
       _title = 'Editar Item - ${widget.item.name}';
       _nameController.text = widget.item.name;
-      if (_isPlace) {
-        _coordinates = widget.item.coordinates;
-      }
+      _coordinates = widget.item.coordinates;
+      _isPlace = widget.item.isPlace;
     }
   }
 
