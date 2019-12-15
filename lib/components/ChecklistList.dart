@@ -100,6 +100,16 @@ class _ChecklistListState extends State<ChecklistList> {
   }
 
   void _sortList() {
-    _trip.checklists.sort((Checklist a, Checklist b) => a.name.compareTo(b.name));
+    _trip.checklists.sort((Checklist a, Checklist b) {
+      double aPercentage = a.totalItems > 0 ? a.checkedItems / a.totalItems : 0;
+      double bPercentage = b.totalItems > 0 ? b.checkedItems / b.totalItems : 0;
+      if (aPercentage > bPercentage) {
+        return 1;
+      }
+      if (bPercentage > aPercentage) {
+        return -1;
+      }
+      return a.name.compareTo(b.name);
+    });
   }
 }
