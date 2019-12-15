@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:travel_checklist/components/AppDrawer.dart';
 import 'package:travel_checklist/models/Checklist.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
@@ -53,6 +54,7 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
           ),
         ],
       ),
+      drawer: AppDrawer(currentScreen: Screen.ChecklistForm),
       body: SingleChildScrollView(
         child: Form(
           child: Column(

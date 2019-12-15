@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:travel_checklist/components/AppDrawer.dart';
 import 'package:travel_checklist/services/PreferencesManager.dart';
 import 'package:travel_checklist/enums.dart';
 
@@ -38,6 +39,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         title: Text('Configurações'),
       ),
+      drawer: AppDrawer(currentScreen: Screen.Settings),
       body: Container(
         child: ListView(
           children: widgets,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:place_picker/place_picker.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:travel_checklist/components/AppDrawer.dart';
 import 'package:travel_checklist/models/Checklist.dart';
 import 'package:travel_checklist/models/ChecklistItem.dart';
 import 'package:travel_checklist/screens/MapScreen.dart';
@@ -59,6 +60,7 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
           ),
         ],
       ),
+      drawer: AppDrawer(currentScreen: Screen.ChecklistItemForm),
       body: SingleChildScrollView(
         child: Form(
           child: Column(

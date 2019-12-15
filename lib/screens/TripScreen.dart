@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:travel_checklist/components/AppDrawer.dart';
 import 'package:travel_checklist/components/ChecklistList.dart';
 import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/screens/ChecklistFormScreen.dart';
@@ -44,6 +45,7 @@ class _TripScreenState extends State<TripScreen> {
       appBar: AppBar(
         title: Text(_trip.name),
       ),
+      drawer: AppDrawer(currentScreen: Screen.Trip),
       body: Column(
         children: <Widget> [
           Container(

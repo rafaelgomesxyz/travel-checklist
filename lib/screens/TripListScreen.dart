@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:travel_checklist/components/AppDrawer.dart';
 import 'package:travel_checklist/components/TripList.dart';
 import 'package:travel_checklist/enums.dart';
 import 'package:travel_checklist/screens/TripFormScreen.dart';
@@ -20,6 +21,7 @@ class _TripListScreenState extends State<TripListScreen> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
+      drawer: AppDrawer(currentScreen: Screen.TripList),
       body: TripList(),
       floatingActionButton: SpeedDial(
         animatedIcon: AnimatedIcons.menu_close,

@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:place_picker/place_picker.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:travel_checklist/components/AppDrawer.dart';
 import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/screens/MapScreen.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
@@ -70,6 +71,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
           ),
         ],
       ),
+      drawer: AppDrawer(currentScreen: Screen.TripForm),
       body: SingleChildScrollView(
         child: Form(
           child: Column(

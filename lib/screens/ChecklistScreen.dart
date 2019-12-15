@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:travel_checklist/components/AppDrawer.dart';
 import 'package:travel_checklist/components/ChecklistItemList.dart';
 import 'package:travel_checklist/models/Checklist.dart';
 import 'package:travel_checklist/screens/ChecklistFormScreen.dart';
@@ -40,6 +41,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
       appBar: AppBar(
         title: Text(_checklist.name),
       ),
+      drawer: AppDrawer(currentScreen: Screen.Checklist),
       body: Column(
         children: <Widget> [
           Container(

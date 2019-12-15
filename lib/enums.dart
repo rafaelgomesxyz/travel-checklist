@@ -11,6 +11,19 @@ enum Event {
   TripRemoved,
 }
 
+enum Screen {
+  ChecklistForm,
+  ChecklistItemForm,
+  Checklist,
+  Home,
+  Map,
+  Settings,
+  TripForm,
+  TripList,
+  Trip,
+  Welcome,
+}
+
 enum Setting {
   Switch,
 }

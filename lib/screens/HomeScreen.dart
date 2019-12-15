@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:travel_checklist/components/AppDrawer.dart';
 import 'package:travel_checklist/components/TripList.dart';
 import 'package:travel_checklist/screens/SettingsScreen.dart';
 import 'package:travel_checklist/screens/TripFormScreen.dart';
@@ -21,21 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      drawer: Drawer(
-        child: SafeArea(
-          child: ListView(
-            children: <Widget> [
-              ListTile(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_context) => SettingsScreen()));
-                },
-                title: Text('Configurações'),
-              ),
-            ],
-            padding: EdgeInsets.zero,
-          ),
-        ),
-      ),
+      drawer: AppDrawer(currentScreen: Screen.Home),
       body: Container(
         child: Column(
           children: <Widget>[
