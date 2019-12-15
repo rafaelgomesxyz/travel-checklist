@@ -35,19 +35,7 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
   void initState() {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
-    if (widget.item == null) {
-      _isPlace = widget.checklist.forPlaces;
-      _title = 'Criar Item';
-      if (_isPlace) {
-        _coordinates = widget.coordinates;
-      }
-    } else {
-      _isCreating = false;
-      _title = 'Editar Item - ${widget.item.name}';
-      _nameController.text = widget.item.name;
-      _coordinates = widget.item.coordinates;
-      _isPlace = widget.item.isPlace;
-    }
+    _resetFields();
   }
 
   @override
@@ -65,7 +53,7 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: () {
-              // TODO: resetar campos
+              _resetFields();
             },
           ),
         ],
@@ -183,5 +171,28 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
         top: 20.0,
       ),
     );
+  }
+
+  void _resetFields() {
+    setState(() {
+      if (widget.item == null) {
+        _isCreating = true;
+        _title = 'Criar Item';
+        _nameController.text = '';
+        if (widget.checklist.forPlaces) {
+          _coordinates = widget.coordinates;
+          _isPlace = true;
+        } else {
+          _coordinates = '';
+          _isPlace = false;
+        }
+      } else {
+        _isCreating = false;
+        _title = 'Editar Item - ${widget.item.name}';
+        _nameController.text = widget.item.name;
+        _coordinates = widget.item.coordinates;
+        _isPlace = widget.item.isPlace;
+      }
+    });
   }
 }

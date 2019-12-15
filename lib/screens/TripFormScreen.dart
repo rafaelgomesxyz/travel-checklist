@@ -39,22 +39,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
     _dateFormat = DateFormat.yMd('pt_BR').add_Hm();
-    if (widget.trip == null) {
-      if (widget.template != null) {
-        _template = widget.template;
-        _title = 'Criar Viagem - ${_template}';
-      } else {
-        _template = 'Blank';
-        _title = 'Criar Viagem';
-      }
-    } else {
-      _isCreating = false;
-      _title = 'Editar Viagem - ${widget.trip.name}';
-      _nameController.text = widget.trip.name;
-      _destinationController.text = widget.trip.destination;
-      _destinationCoordinates = widget.trip.destinationCoordinates;
-      _timestampController.text = _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(widget.trip.timestamp));
-    }
+    _resetFields();
   }
 
   @override
@@ -75,7 +60,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: () {
-              // TODO: resetar
+              _resetFields();
             },
           ),
         ],
@@ -261,5 +246,32 @@ class _TripFormScreenState extends State<TripFormScreen> {
         top: 20.0,
       ),
     );
+  }
+
+  void _resetFields() {
+    setState(() {
+      if (widget.trip == null) {
+        _isCreating = true;
+        if (widget.template != null) {
+          _template = widget.template;
+          _title = 'Criar Viagem - ${_template}';
+        } else {
+          _template = 'Blank';
+          _title = 'Criar Viagem';
+        }
+        _nameController.text = '';
+        _destinationController.text = '';
+        _destinationCoordinates = '';
+        _timestampController.text = '';
+      } else {
+        _isCreating = false;
+        _template = 'Blank';
+        _title = 'Editar Viagem - ${widget.trip.name}';
+        _nameController.text = widget.trip.name;
+        _destinationController.text = widget.trip.destination;
+        _destinationCoordinates = widget.trip.destinationCoordinates;
+        _timestampController.text = _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(widget.trip.timestamp));
+      }
+    });
   }
 }

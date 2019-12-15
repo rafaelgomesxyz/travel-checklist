@@ -29,14 +29,7 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
   void initState() {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
-    if (widget.checklist == null) {
-      _title = 'Criar Checklist';
-    } else {
-      _isCreating = false;
-      _title = 'Editar Checklist - ${widget.checklist.name}';
-      _nameController.text = widget.checklist.name;
-      _forPlaces = widget.checklist.forPlaces;
-    }
+    _resetFields();
   }
 
   @override
@@ -54,7 +47,7 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: () {
-              // TODO: implementar resetar
+              _resetFields();
             }
           ),
         ],
@@ -159,5 +152,21 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
         top: 20.0,
       ),
     );
+  }
+
+  void _resetFields() {
+    setState(() {
+      if (widget.checklist == null) {
+        _isCreating = true;
+        _title = 'Criar Checklist';
+        _nameController.text = '';
+        _forPlaces = false;
+      } else {
+        _isCreating = false;
+        _title = 'Editar Checklist - ${widget.checklist.name}';
+        _nameController.text = widget.checklist.name;
+        _forPlaces = widget.checklist.forPlaces;
+      }
+    });
   }
 }
