@@ -1,14 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:travel_checklist/screens/HomeScreen.dart';
-import 'package:travel_checklist/services/PreferencesManager.dart';
+import 'package:travel_checklist/screens/WelcomeScreen.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await PreferencesManager.instance.init();
-  await initializeDateFormatting('pt_BR', null);
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
@@ -19,7 +12,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeScreen(title: 'Travel Checklist'),
+      home: WelcomeScreen(title: 'Travel Checklist'),
     );
   }
 }
