@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:travel_checklist/components/TripList.dart';
-import 'package:travel_checklist/enums.dart';
+import 'package:travel_checklist/screens/SettingsScreen.dart';
 import 'package:travel_checklist/screens/TripFormScreen.dart';
-import 'TripListScreen.dart';
+import 'package:travel_checklist/screens/TripListScreen.dart';
+import 'package:travel_checklist/enums.dart';
 
 class HomeScreen extends StatefulWidget {
   final String title;
@@ -19,6 +20,21 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+      ),
+      drawer: Drawer(
+        child: SafeArea(
+          child: ListView(
+            children: <Widget> [
+              ListTile(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_context) => SettingsScreen()));
+                },
+                title: Text('Configurações'),
+              ),
+            ],
+            padding: EdgeInsets.zero,
+          ),
+        ),
       ),
       body: Container(
         child: Column(

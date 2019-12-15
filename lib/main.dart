@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import './screens/HomeScreen.dart';
+import 'package:travel_checklist/screens/HomeScreen.dart';
+import 'package:travel_checklist/services/PreferencesManager.dart';
 
-void main() {
-  initializeDateFormatting('pt_BR', null).then((_) => runApp(MyApp()));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await PreferencesManager.instance.init();
+  await initializeDateFormatting('pt_BR', null);
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -11,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Travel Checklist',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

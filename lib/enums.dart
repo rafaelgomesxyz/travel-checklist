@@ -11,6 +11,10 @@ enum Event {
   TripRemoved,
 }
 
+enum Setting {
+  Switch,
+}
+
 enum Template {
   Praia,
   Campo,
