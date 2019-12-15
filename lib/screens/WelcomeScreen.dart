@@ -39,13 +39,28 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             alignment: Alignment.topCenter,
             child: Column(
               children: <Widget> [
-                Text(
-                  'Travel Checklist',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Column(
+                  children: <Widget> [
+                    Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/icon.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      height: 48.0,
+                      margin: EdgeInsets.only(bottom: 25.0),
+                      width: 48.0,
+                    ),
+                    Text(
+                      'Travel Checklist',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 25.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
                 CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
