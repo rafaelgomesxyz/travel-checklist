@@ -24,7 +24,7 @@ class _TripListScreenState extends State<TripListScreen> {
       drawer: AppDrawer(currentScreen: Screen.TripList),
       body: TripList(),
       floatingActionButton: SpeedDial(
-        animatedIcon: AnimatedIcons.menu_close,
+        animatedIcon: AnimatedIcons.add_event,
         animatedIconTheme: IconThemeData(size: 22.0),
         backgroundColor: Colors.white,
         closeManually: false,
