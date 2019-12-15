@@ -104,15 +104,40 @@ class _ChecklistItemCardState extends State<ChecklistItemCard> {
               size: 20.0
             ),
             label: Text('Deletar Item'),
-            onPressed: () async {
-              await _dbHelper.deleteChecklistItem(_item.id);
-              _eDispatcher.emit(Event.ChecklistItemRemoved, { 'item': _item });
-              Navigator.pop(_context);
+            onPressed: () {
+              _deleteChecklistItem();
             },
             padding: EdgeInsets.all(0.0),
           ),
         ],
         contentPadding: EdgeInsets.all(0.0),
+      ),
+      context: context,
+    );
+  }
+
+  void _deleteChecklistItem() {
+    showDialog(
+      builder: (BuildContext _context) => AlertDialog(
+        actions: <Widget> [
+          FlatButton(
+            child: Text('Não'),
+            onPressed: () {
+              Navigator.pop(_context);
+              Navigator.pop(context);
+            },
+          ),
+          FlatButton(
+            child: Text('Sim'),
+            onPressed: () async {
+              await _dbHelper.deleteChecklistItem(_item.id);
+              _eDispatcher.emit(Event.ChecklistItemRemoved, { 'item': _item });
+              Navigator.pop(_context);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+        title: Text('Tem certeza que deseja deletar esse item?'),
       ),
       context: context,
     );

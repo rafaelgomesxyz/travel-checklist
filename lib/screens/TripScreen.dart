@@ -130,10 +130,8 @@ class _TripScreenState extends State<TripScreen> {
             child: Icon(Icons.delete),
             label: 'Deletar Viagem',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () async {
-              await _dbHelper.deleteTrip(_trip.id);
-              _eDispatcher.emit(Event.TripRemoved, { 'trip': _trip });
-              Navigator.pop(context);
+            onTap: () {
+              _deleteTrip();
             },
           ),
           SpeedDialChild(
@@ -159,6 +157,32 @@ class _TripScreenState extends State<TripScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _deleteTrip() {
+    showDialog(
+      builder: (BuildContext _context) => AlertDialog(
+        actions: <Widget> [
+          FlatButton(
+            child: Text('Não'),
+            onPressed: () {
+              Navigator.pop(_context);
+            },
+          ),
+          FlatButton(
+            child: Text('Sim'),
+            onPressed: () async {
+              await _dbHelper.deleteTrip(_trip.id);
+              _eDispatcher.emit(Event.TripRemoved, { 'trip': _trip });
+              Navigator.pop(_context);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+        title: Text('Tem certeza que deseja deletar essa viagem?'),
+      ),
+      context: context,
     );
   }
 }

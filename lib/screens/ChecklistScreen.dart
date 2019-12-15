@@ -81,10 +81,8 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
             child: Icon(Icons.delete),
             label: 'Deletar Checklist',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () async {
-              await _dbHelper.deleteChecklist(_checklist.id);
-              _eDispatcher.emit(Event.ChecklistRemoved, { 'checklist': _checklist });
-              Navigator.pop(context);
+            onTap: () {
+              _deleteChecklist();
             },
           ),
           SpeedDialChild(
@@ -110,6 +108,32 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _deleteChecklist() {
+    showDialog(
+      builder: (BuildContext _context) => AlertDialog(
+        actions: <Widget> [
+          FlatButton(
+            child: Text('Não'),
+            onPressed: () {
+              Navigator.pop(_context);
+            },
+          ),
+          FlatButton(
+            child: Text('Sim'),
+            onPressed: () async {
+              await _dbHelper.deleteChecklist(_checklist.id);
+              _eDispatcher.emit(Event.ChecklistRemoved, { 'checklist': _checklist });
+              Navigator.pop(_context);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+        title: Text('Tem certeza que deseja deletar essa checklist?'),
+      ),
+      context: context,
     );
   }
 }
