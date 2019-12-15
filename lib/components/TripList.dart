@@ -17,9 +17,9 @@ class TripList extends StatefulWidget {
 }
 
 class _TripListState extends State<TripList> {
-  List<Trip> _trips = [];
   int _numToShow;
 
+  StreamController<List<Trip>> _listController = StreamController<List<Trip>>();
   StreamSubscription _tripAddedSubscription;
   StreamSubscription _tripRemovedSubscription;
 
@@ -42,6 +42,7 @@ class _TripListState extends State<TripList> {
 
   @override
   void dispose() {
+    _listController.close();
     _tripAddedSubscription.cancel();
     _tripRemovedSubscription.cancel();
     super.dispose();
@@ -49,46 +50,59 @@ class _TripListState extends State<TripList> {
 
   @override
   build(BuildContext context) {
-    if (_trips.length > 0) {
-      _sortList();
-      return RefreshIndicator(
-        child: ListView(
-          children: _trips.map((Trip trip) => TripCard(trip: trip)).toList(),
-          padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, _numToShow > 0 ? 10.0 : 75.0),
-        ),
-        onRefresh: () async {
-          _loadTrips({});
-          return;
-        },
-      );
-    }
-
     return RefreshIndicator(
-      child: Column(
-        children: <Widget> [
-          Container(
-            child: Text('Nenhuma viagem encontrada.'),
-            alignment: Alignment.center,
-          ),
-        ],
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: StreamBuilder(
+        builder: (BuildContext _context, AsyncSnapshot<List<Trip>> snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data.length > 0) {
+              _sortList(snapshot.data);
+              return ListView.builder(
+                itemBuilder: (BuildContext __context, int index) {
+                  Trip trip = snapshot.data[index];
+                  return TripCard(
+                    key: Key(trip.id.toString()),
+                    trip: trip,
+                  );
+                },
+                itemCount: snapshot.data.length,
+                padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, _numToShow > 0 ? 10.0 : 75.0),
+              );
+            }
+            return Column(
+              children: <Widget> [
+                Container(
+                  child: Text('Nenhuma viagem encontrada.'),
+                  alignment: Alignment.center,
+                ),
+              ],
+              mainAxisAlignment: MainAxisAlignment.center,
+            );
+          }
+          return Column(
+            children: <Widget> [
+              Container(
+                child: CircularProgressIndicator(),
+                alignment: Alignment.center,
+              ),
+            ],
+            mainAxisAlignment: MainAxisAlignment.center,
+          );
+        },
+        stream: _listController.stream,
       ),
       onRefresh: () async {
         _loadTrips({});
-        return;
       },
     );
   }
 
   void _loadTrips(Map<String, dynamic> unused) async {
     List<Trip> trips = await _dbHelper.getTrips();
-    setState(() {
-      _trips = trips;
-    });
+    _listController.sink.add(trips);
   }
 
-  void _sortList() {
-    _trips.sort((Trip a, Trip b) {
+  void _sortList(List<Trip> trips) {
+    trips.sort((Trip a, Trip b) {
       if (a.timestamp > b.timestamp) {
         return 1;
       }
@@ -97,8 +111,8 @@ class _TripListState extends State<TripList> {
       }
       return 0;
     });
-    if (_numToShow > 0 && _trips.length > 3) {
-      _trips.removeRange(3, _trips.length);
+    if (_numToShow > 0 && trips.length > _numToShow) {
+      trips.removeRange(_numToShow, trips.length);
     }
   }
 }

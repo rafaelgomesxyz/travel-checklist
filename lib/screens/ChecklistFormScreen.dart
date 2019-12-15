@@ -133,7 +133,7 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
               checklist.name = _nameController.text;
               checklist.forPlaces = _forPlaces;
               checklist.id = await _dbHelper.insertChecklist(checklist);
-              _eDispatcher.emit(Event.ChecklistAdded, { 'checklist': checklist});
+              _eDispatcher.emit(Event.ChecklistAdded, { 'checklist': checklist });
             } else {
               widget.checklist.name = _nameController.text;
               widget.checklist.forPlaces = _forPlaces;

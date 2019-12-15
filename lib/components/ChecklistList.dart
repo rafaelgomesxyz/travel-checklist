@@ -18,8 +18,8 @@ class ChecklistList extends StatefulWidget {
 }
 
 class _ChecklistListState extends State<ChecklistList> {
-  Trip _trip;
-
+  StreamController<Trip> _listController = StreamController<Trip>();
+  StreamSubscription _checklistItemCheckedSubscription;
   StreamSubscription _checklistAddedSubscription;
   StreamSubscription _checklistRemovedSubscription;
 
@@ -30,6 +30,7 @@ class _ChecklistListState extends State<ChecklistList> {
   void initState() {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
+    _checklistItemCheckedSubscription = _eDispatcher.listen(Event.ChecklistItemChecked, _onChecklistItemChecked);
     _checklistAddedSubscription = _eDispatcher.listen(Event.ChecklistAdded, _onChecklistAdded);
     _checklistRemovedSubscription = _eDispatcher.listen(Event.ChecklistRemoved, _onChecklistRemoved);
     _loadChecklists();
@@ -37,6 +38,8 @@ class _ChecklistListState extends State<ChecklistList> {
 
   @override
   void dispose() {
+    _listController.close();
+    _checklistItemCheckedSubscription.cancel();
     _checklistAddedSubscription.cancel();
     _checklistRemovedSubscription.cancel();
     super.dispose();
@@ -44,63 +47,74 @@ class _ChecklistListState extends State<ChecklistList> {
 
   @override
   build(BuildContext context) {
-    if (_trip != null && _trip.checklists.length > 0) {
-      _sortList();
-      return RefreshIndicator(
-        child: ListView(
-          children: _trip.checklists.map((Checklist checklist) => ChecklistCard(checklist: checklist, coordinates: _trip.destinationCoordinates)).toList(),
-          padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 75.0),
-        ),
-        onRefresh: () async {
-          _loadChecklists();
-          return;
-        },
-      );
-    }
     return RefreshIndicator(
-      child: Column(
-        children: <Widget> [
-          Container(
-            child: Text('Nenhuma checklist encontrada.'),
-            alignment: Alignment.center,
-          ),
-        ],
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: StreamBuilder(
+        builder: (BuildContext _context, AsyncSnapshot<Trip> snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data.checklists.length > 0) {
+              _sortList(snapshot.data);
+              return ListView.builder(
+                itemBuilder: (BuildContext __context, int index) {
+                  Checklist checklist = snapshot.data.checklists[index];
+                  return ChecklistCard(
+                    key: Key(checklist.id.toString()),
+                    checklist: checklist,
+                    coordinates: snapshot.data.destinationCoordinates,
+                  );
+                },
+                itemCount: snapshot.data.checklists.length,
+                padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 75.0),
+              );
+            }
+            return Column(
+              children: <Widget> [
+                Container(
+                  child: Text('Nenhuma checklist encontrada.'),
+                  alignment: Alignment.center,
+                ),
+              ],
+              mainAxisAlignment: MainAxisAlignment.center,
+            );
+          }
+          return Column(
+            children: <Widget> [
+              Container(
+                child: CircularProgressIndicator(),
+                alignment: Alignment.center,
+              ),
+            ],
+            mainAxisAlignment: MainAxisAlignment.center,
+          );
+        },
+        stream: _listController.stream,
       ),
       onRefresh: () async {
         _loadChecklists();
-        return;
       },
     );
   }
 
   void _loadChecklists() async {
     widget.trip.checklists = await _dbHelper.getChecklists(widget.trip.id);
-    setState(() {
-      _trip = widget.trip;
-    });
+    _listController.sink.add(widget.trip);
+  }
+
+  void _onChecklistItemChecked(Map<String, dynamic> data) {
+    _listController.sink.add(widget.trip);
   }
 
   void _onChecklistAdded(Map<String, dynamic> data) {
-    if (mounted) {
-      widget.trip.addChecklist(data['checklist']);
-      setState(() {
-        _trip = widget.trip;
-      });
-    }
+    widget.trip.addChecklist(data['checklist']);
+    _listController.sink.add(widget.trip);
   }
 
   void _onChecklistRemoved(Map<String, dynamic> data) {
-    if (mounted) {
-      widget.trip.removeChecklist(data['checklist'].id);
-      setState(() {
-        _trip = widget.trip;
-      });
-    }
+    widget.trip.removeChecklist(data['checklist'].id);
+    _listController.sink.add(widget.trip);
   }
 
-  void _sortList() {
-    _trip.checklists.sort((Checklist a, Checklist b) {
+  void _sortList(Trip trip) {
+    trip.checklists.sort((Checklist a, Checklist b) {
       double aPercentage = a.totalItems > 0 ? a.checkedItems / a.totalItems : 0;
       double bPercentage = b.totalItems > 0 ? b.checkedItems / b.totalItems : 0;
       if (aPercentage > bPercentage) {

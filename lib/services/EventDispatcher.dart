@@ -16,7 +16,7 @@ class EventDispatcher {
 
   void emit(Event event, Map<String, dynamic> data) {
     if (this._streamControllers.containsKey(event)) {
-      this._streamControllers[event].add(data);
+      this._streamControllers[event].sink.add(data);
     }
   }
 
