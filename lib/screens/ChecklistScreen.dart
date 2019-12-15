@@ -112,7 +112,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
             label: 'Criar Item',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ChecklistItemFormScreen(checklist: widget.checklist.id, coordinates: widget.coordinates)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ChecklistItemFormScreen(checklist: widget.checklist, coordinates: widget.coordinates)));
             },
           ),
         ],

@@ -4,6 +4,7 @@ class Checklist {
   int id = 0;
   int trip = 0;
   String name = '';
+  bool forPlaces = false;
   int checkedItems = 0;
   int totalItems = 0;
   List<ChecklistItem> items = [];

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:place_picker/place_picker.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:travel_checklist/models/Checklist.dart';
 import 'package:travel_checklist/models/ChecklistItem.dart';
 import 'package:travel_checklist/screens/MapScreen.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
@@ -9,7 +10,7 @@ import 'package:travel_checklist/services/EventDispatcher.dart';
 
 class ChecklistItemFormScreen extends StatefulWidget {
   final ChecklistItem item;
-  final int checklist;
+  final Checklist checklist;
   final String coordinates;
 
   ChecklistItemFormScreen({ Key key, this.item, this.checklist, this.coordinates }) : super(key: key);
@@ -34,15 +35,19 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
   void initState() {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
+    _isPlace = widget.checklist.forPlaces;
     if (widget.item == null) {
       _title = 'Criar Item';
-      _coordinates = widget.coordinates;
+      if (_isPlace) {
+        _coordinates = widget.coordinates;
+      }
     } else {
       _isCreating = false;
       _title = 'Editar Item - ${widget.item.name}';
       _nameController.text = widget.item.name;
-      _coordinates = widget.item.coordinates;
-      _isPlace = _coordinates.isNotEmpty;
+      if (_isPlace) {
+        _coordinates = widget.item.coordinates;
+      }
     }
   }
 
@@ -98,26 +103,6 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
                   return null;
                 },
               ),
-              Row(
-                children: <Widget> [
-                  Checkbox(
-                    onChanged: (bool isChecked) {
-                      setState(() {
-                        _isPlace = isChecked;
-                        _nameController.text = '';
-                      });
-                    },
-                    value: _isPlace,
-                  ),
-                  Text(
-                    'O item é um lugar.',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
               Visibility(
                 child: FlatButton.icon(
                   color: Colors.blueAccent,
@@ -127,14 +112,14 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
                   onPressed: () async {
                     double latitude = 0.0;
                     double longitude = 0.0;
-                    if  (_isPlace && _coordinates.isNotEmpty) {
+                    if  (_coordinates.isNotEmpty) {
                       List<String> latlng = _coordinates.split(',');
                       latitude = double.parse(latlng[0]);
                       longitude = double.parse(latlng[1]);
                     }
                     LocationResult result = await Navigator.push(context, MaterialPageRoute(
                       builder: (_context) => MapScreen(
-                        initialLocation: _isPlace && _coordinates.isNotEmpty ? LatLng(latitude, longitude) : null,
+                        initialLocation: _coordinates.isNotEmpty ? LatLng(latitude, longitude) : null,
                       ),
                     ));
                     if (result != null) {
@@ -175,7 +160,7 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
           if (_formKey.currentState.validate()) {
             if (_isCreating) {
               ChecklistItem item = ChecklistItem();
-              item.checklist = widget.checklist;
+              item.checklist = widget.checklist.id;
               item.name = _nameController.text;
               item.coordinates = _coordinates;
               item.id = await _dbHelper.insertChecklistItem(item);

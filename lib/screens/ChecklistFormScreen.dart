@@ -17,6 +17,7 @@ class ChecklistFormScreen extends StatefulWidget {
 class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
   bool _isCreating = true;
   String _title = '';
+  bool _forPlaces = false;
 
   final _dbHelper = DatabaseHelper.instance;
   final _eDispatcher = EventDispatcher.instance;
@@ -34,6 +35,7 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
       _isCreating = false;
       _title = 'Editar Checklist - ${widget.checklist.name}';
       _nameController.text = widget.checklist.name;
+      _forPlaces = widget.checklist.forPlaces;
     }
   }
 
@@ -85,6 +87,28 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
                   return null;
                 },
               ),
+              Visibility(
+                child: Row(
+                  children: <Widget> [
+                    Checkbox(
+                      onChanged: (bool isChecked) {
+                        setState(() {
+                          _forPlaces = isChecked;
+                        });
+                      },
+                      value: _forPlaces,
+                    ),
+                    Text(
+                      'Criar checklist para lugares.',
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                visible: _isCreating,
+              ),
               _buildButton(),
             ],
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -113,10 +137,12 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
               Checklist checklist = Checklist();
               checklist.trip = widget.trip;
               checklist.name = _nameController.text;
+              checklist.forPlaces = _forPlaces;
               checklist.id = await _dbHelper.insertChecklist(checklist);
               _eDispatcher.emit(EventDispatcher.eventChecklistAdded, { 'checklist': checklist});
             } else {
               widget.checklist.name = _nameController.text;
+              widget.checklist.forPlaces = _forPlaces;
               await _dbHelper.updateChecklist(widget.checklist);
             }
             Navigator.pop(context);

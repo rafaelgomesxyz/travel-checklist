@@ -18,6 +18,7 @@ class DatabaseHelper {
   static final columnName = 'name';
   static final columnCoordinates = 'coordinates';
   static final columnIsChecked = 'is_checked';
+  static final columnForPlaces = 'for_places';
   static final columnDestination = 'destination';
   static final columnDestinationCoordinates = 'destination_coordinates';
   static final columnTimestamp = 'timestamp';
@@ -35,7 +36,8 @@ class DatabaseHelper {
     CREATE TABLE $tableChecklist (
       $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
       $tableTrip INTEGER NOT NULL REFERENCES $tableTrip ($columnId),
-      $columnName VARCHAR(255) NOT NULL
+      $columnName VARCHAR(255) NOT NULL,
+      $columnForPlaces TINYINT NOT NULL
     )
   ''';
   static final schemaTrip = '''
@@ -89,6 +91,7 @@ class DatabaseHelper {
     Map<String, dynamic> row = {};
     row[tableTrip] = checklist.trip;
     row[columnName] = checklist.name;
+    row[columnForPlaces] = checklist.forPlaces;
     return await db.insert(tableChecklist, row);
   }
 
@@ -115,6 +118,7 @@ class DatabaseHelper {
     Database db = await instance.database;
     Map<String, dynamic> row = {};
     row[columnName] = checklist.name;
+    row[columnForPlaces] = checklist.forPlaces;
     return await db.update(tableChecklist, row, where: '$columnId = ?', whereArgs: [checklist.id]);
   }
 
@@ -153,6 +157,7 @@ class DatabaseHelper {
       checklist.id = row[columnId];
       checklist.trip = row[tableTrip];
       checklist.name = row[columnName];
+      checklist.forPlaces = row[columnForPlaces] == 1;
       checklist.checkedItems = Sqflite.firstIntValue(
         await db.rawQuery('SELECT COUNT(*) FROM $tableChecklistItem WHERE $tableChecklist = ${checklist.id} AND $columnIsChecked = 1')
       );
