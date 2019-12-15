@@ -159,6 +159,8 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
         onPressed: () async {
           if (_formKey.currentState.validate()) {
             if (_isCreating) {
+              SnackBar snackBar = SnackBar(content: Text('Criando item...'));
+              Scaffold.of(context).showSnackBar(snackBar);
               ChecklistItem item = ChecklistItem();
               item.checklist = widget.checklist.id;
               item.name = _nameController.text;
@@ -166,6 +168,8 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
               item.id = await _dbHelper.insertChecklistItem(item);
               _eDispatcher.emit(EventDispatcher.eventChecklistItemAdded, { 'item': item});
             } else {
+              SnackBar snackBar = SnackBar(content: Text('Editando item...'));
+              Scaffold.of(context).showSnackBar(snackBar);
               widget.item.name = _nameController.text;
               widget.item.coordinates = _coordinates;
               await _dbHelper.updateChecklistItem(widget.item);

@@ -104,6 +104,8 @@ class _ChecklistItemCardState extends State<ChecklistItemCard> {
             ),
             label: Text('Deletar Item'),
             onPressed: () async {
+              SnackBar snackBar = SnackBar(content: Text('Deletando item...'));
+              Scaffold.of(context).showSnackBar(snackBar);
               await _dbHelper.deleteChecklistItem(_item.id);
               _eDispatcher.emit(EventDispatcher.eventChecklistItemRemoved, { 'item': _item });
               Navigator.pop(_context);

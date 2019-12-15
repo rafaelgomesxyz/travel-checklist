@@ -122,6 +122,8 @@ class _TripScreenState extends State<TripScreen> {
             label: 'Deletar Viagem',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () async {
+              SnackBar snackBar = SnackBar(content: Text('Deletando viagem...'));
+              Scaffold.of(context).showSnackBar(snackBar);
               await _dbHelper.deleteTrip(_trip.id);
               _eDispatcher.emit(EventDispatcher.eventTripRemoved, { 'trip': _trip });
               Navigator.pop(context);
