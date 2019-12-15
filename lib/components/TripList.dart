@@ -53,7 +53,7 @@ class _TripListState extends State<TripList> {
       return RefreshIndicator(
         child: ListView(
           children: _trips.map((Trip trip) => TripCard(trip: trip)).toList(),
-          padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 75.0),
+          padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, _numToShow > 0 ? 10.0 : 75.0),
         ),
         onRefresh: () async {
           _loadTrips({});
