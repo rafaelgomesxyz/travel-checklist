@@ -89,8 +89,6 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
             label: 'Deletar Checklist',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () async {
-              SnackBar snackBar = SnackBar(content: Text('Deletando checklist...'));
-              Scaffold.of(context).showSnackBar(snackBar);
               await _dbHelper.deleteChecklist(_checklist.id);
               _eDispatcher.emit(EventDispatcher.eventChecklistRemoved, { 'checklist': _checklist });
               Navigator.pop(context);

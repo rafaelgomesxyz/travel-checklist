@@ -214,8 +214,6 @@ class _TripFormScreenState extends State<TripFormScreen> {
         onPressed: () async {
           if (_formKey.currentState.validate()) {
             if (_isCreating) {
-              SnackBar snackBar = SnackBar(content: Text('Criando viagem...'));
-              Scaffold.of(context).showSnackBar(snackBar);
               Trip trip = Trip();
               trip.name = _nameController.text;
               trip.destination = _destinationController.text;
@@ -226,8 +224,6 @@ class _TripFormScreenState extends State<TripFormScreen> {
               trip.id = await _dbHelper.insertTrip(trip);
               _eDispatcher.emit(EventDispatcher.eventTripAdded, { 'trip': trip});
             } else {
-              SnackBar snackBar = SnackBar(content: Text('Editando viagem...'));
-              Scaffold.of(context).showSnackBar(snackBar);
               widget.trip.name = _nameController.text;
               widget.trip.destination = _destinationController.text;
               widget.trip.destinationCoordinates = _destinationCoordinates;
