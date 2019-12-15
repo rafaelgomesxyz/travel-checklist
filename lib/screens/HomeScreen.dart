@@ -18,9 +18,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.refresh), onPressed: () {} ),
-        ],
       ),
       body: Container(
         child: Column(

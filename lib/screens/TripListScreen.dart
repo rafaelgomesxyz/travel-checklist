@@ -18,9 +18,6 @@ class _TripListScreenState extends State<TripListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.refresh), onPressed: () {} ),
-        ],
       ),
       body: TripList(),
       floatingActionButton: SpeedDial(

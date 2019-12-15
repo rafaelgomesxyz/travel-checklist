@@ -41,14 +41,6 @@ class _TripScreenState extends State<TripScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_trip.name),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              // TODO: resetar
-            },
-          ),
-        ],
       ),
       body: Column(
         children: <Widget> [

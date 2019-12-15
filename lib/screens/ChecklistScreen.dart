@@ -38,14 +38,6 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_checklist.name),
-        actions: <Widget> [
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              // TODO: resetar
-            },
-          ),
-        ],
       ),
       body: Column(
         children: <Widget> [
