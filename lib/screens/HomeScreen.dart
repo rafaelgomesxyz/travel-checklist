@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:travel_checklist/components/TripList.dart';
+import 'package:travel_checklist/enums.dart';
 import 'package:travel_checklist/screens/TripFormScreen.dart';
 import 'TripListScreen.dart';
 
@@ -32,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
               margin: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
             ),
             Expanded(
-              child: TripList(numToShow: 3),
+              child: TripList(numToShow: 2),
               flex: 1,
             ),
             Expanded(
@@ -69,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         icon: Icon(Icons.beach_access),
                         label: Text('PRAIA'),
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'PRAIA')));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: Template.Praia)));
                         },
                       ),
                     ),
@@ -84,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         icon: Icon(Icons.local_florist),
                         label: Text('CAMPO'),
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CAMPO')));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: Template.Campo)));
                         },
                       ),
                     ),
@@ -99,7 +100,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         icon: Icon(Icons.location_city),
                         label: Text('CIDADE'),
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CIDADE')));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: Template.Cidade)));
+                        },
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                  ),
+                  Container(
+                    child: ButtonTheme(
+                      minWidth: 200.0,
+                      child: FlatButton.icon(
+                        color: Colors.blueAccent,
+                        textColor: Colors.white,
+                        icon: Icon(Icons.flight),
+                        label: Text('OUTRA'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen()));
                         },
                       ),
                     ),
@@ -107,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              flex: 1,
+              flex: 2,
             ),
           ],
           crossAxisAlignment: CrossAxisAlignment.start,

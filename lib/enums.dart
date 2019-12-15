@@ -10,3 +10,10 @@ enum Event {
   TripEdited,
   TripRemoved,
 }
+
+enum Template {
+  Praia,
+  Campo,
+  Cidade,
+  Outro,
+}

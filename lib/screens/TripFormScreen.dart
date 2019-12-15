@@ -12,7 +12,7 @@ import 'package:travel_checklist/enums.dart';
 
 class TripFormScreen extends StatefulWidget {
   final Trip trip;
-  final String template;
+  final Template template;
 
   TripFormScreen({Key key, this.trip, this.template}) : super(key: key);
 
@@ -25,7 +25,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
   bool _isCreating = true;
   String _title = '';
   String _destinationCoordinates = '';
-  String _template = '';
+  Template _template = Template.Outro;
 
   final _dbHelper = DatabaseHelper.instance;
   final _eDispatcher = EventDispatcher.instance;
@@ -222,7 +222,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
               trip.timestamp = _dateFormat
                 .parse(_timestampController.text)
                 .millisecondsSinceEpoch;
-              trip.id = await _dbHelper.insertTrip(trip);
+              trip.id = await _dbHelper.insertTrip(trip, _template);
               _eDispatcher.emit(Event.TripAdded, { 'trip': trip});
             } else {
               widget.trip.name = _nameController.text;
@@ -251,9 +251,9 @@ class _TripFormScreenState extends State<TripFormScreen> {
         _isCreating = true;
         if (widget.template != null) {
           _template = widget.template;
-          _title = 'Criar Viagem - ${_template}';
+          _title = 'Criar Viagem - ${_template.toString().split('.').last}';
         } else {
-          _template = 'Blank';
+          _template = Template.Outro;
           _title = 'Criar Viagem';
         }
         _nameController.text = '';
@@ -262,7 +262,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
         _timestampController.text = '';
       } else {
         _isCreating = false;
-        _template = 'Blank';
+        _template = Template.Outro;
         _title = 'Editar Viagem - ${widget.trip.name}';
         _nameController.text = widget.trip.name;
         _destinationController.text = widget.trip.destination;

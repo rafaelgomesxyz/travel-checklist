@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:travel_checklist/components/TripList.dart';
+import 'package:travel_checklist/enums.dart';
 import 'package:travel_checklist/screens/TripFormScreen.dart';
 
 class TripListScreen extends StatefulWidget {
@@ -40,12 +41,21 @@ class _TripListScreenState extends State<TripListScreen> {
         visible: true,
         children: [
           SpeedDialChild(
+            backgroundColor: Colors.black54,
+            child: Icon(Icons.flight),
+            label: 'OUTRA',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: Template.Outro)));
+            },
+          ),
+          SpeedDialChild(
             backgroundColor: Colors.green,
             child: Icon(Icons.location_city),
             label: 'CIDADE',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CIDADE')));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: Template.Cidade)));
             },
           ),
           SpeedDialChild(
@@ -54,7 +64,7 @@ class _TripListScreenState extends State<TripListScreen> {
             label: 'CAMPO',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'CAMPO')));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: Template.Campo)));
             },
           ),
           SpeedDialChild(
@@ -63,7 +73,7 @@ class _TripListScreenState extends State<TripListScreen> {
             label: 'PRAIA',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: 'PRAIA')));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => TripFormScreen(template: Template.Praia)));
             },
           ),
         ],

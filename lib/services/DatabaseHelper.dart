@@ -2,9 +2,11 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:travel_checklist/enums.dart';
 import 'package:travel_checklist/models/Checklist.dart';
 import 'package:travel_checklist/models/ChecklistItem.dart';
 import 'package:travel_checklist/models/Trip.dart';
+import 'package:travel_checklist/services/TripBuilder.dart';
 
 class DatabaseHelper {
   static final _databaseName = 'database.db';
@@ -95,14 +97,36 @@ class DatabaseHelper {
     return await db.insert(tableChecklist, row);
   }
 
-  Future<int> insertTrip(Trip trip) async {
+  Future<int> insertTrip(Trip trip, Template template) async {
     Database db = await instance.database;
     Map<String, dynamic> row = {};
     row[columnName] = trip.name;
     row[columnDestination] = trip.destination;
     row[columnDestinationCoordinates] = trip.destinationCoordinates;
     row[columnTimestamp] = trip.timestamp;
-    return await db.insert(tableTrip, row);
+    int tripId = await db.insert(tableTrip, row);
+
+    // Fill trip with predefined checklists based on template.
+    Map<String, List<String>> checklists = TripBuilder.instance.getPredefinedChecklists(template);
+    if (checklists != null) {
+      for (String checklistName in checklists.keys) {
+        Checklist checklist = Checklist();
+        checklist.trip = tripId;
+        checklist.name = checklistName;
+        checklist.forPlaces = false;
+        int checklistId = await this.insertChecklist(checklist);
+        for (String itemName in checklists[checklistName]) {
+          ChecklistItem item = ChecklistItem();
+          item.checklist = checklistId;
+          item.name = itemName;
+          item.coordinates = '';
+          item.isChecked = false;
+          await this.insertChecklistItem(item);
+        }
+      }
+    }
+
+    return tripId;
   }
 
   Future<int> updateChecklistItem(ChecklistItem item) async {
