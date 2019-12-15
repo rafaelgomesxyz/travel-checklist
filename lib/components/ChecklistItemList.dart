@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/components/ChecklistItemCard.dart';
@@ -7,6 +6,7 @@ import 'package:travel_checklist/models/Checklist.dart';
 import 'package:travel_checklist/models/ChecklistItem.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
+import 'package:travel_checklist/enums.dart';
 
 class ChecklistItemList extends StatefulWidget {
   final Checklist checklist;
@@ -31,9 +31,9 @@ class _ChecklistItemListState extends State<ChecklistItemList> {
   void initState() {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
-    _itemAddedSubscription = _eDispatcher.listen(EventDispatcher.eventChecklistItemAdded, _onItemAdded);
-    _itemCheckedSubscription = _eDispatcher.listen(EventDispatcher.eventChecklistItemChecked, _onItemChecked);
-    _itemRemovedSubscription = _eDispatcher.listen(EventDispatcher.eventChecklistItemRemoved, _onItemRemoved);
+    _itemAddedSubscription = _eDispatcher.listen(Event.ChecklistItemAdded, _onItemAdded);
+    _itemCheckedSubscription = _eDispatcher.listen(Event.ChecklistItemChecked, _onItemChecked);
+    _itemRemovedSubscription = _eDispatcher.listen(Event.ChecklistItemRemoved, _onItemRemoved);
     _loadItems();
   }
 

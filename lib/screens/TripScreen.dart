@@ -8,6 +8,7 @@ import 'package:travel_checklist/screens/ChecklistFormScreen.dart';
 import 'package:travel_checklist/screens/TripFormScreen.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
+import 'package:travel_checklist/enums.dart';
 
 class TripScreen extends StatefulWidget {
   final Trip trip;
@@ -115,7 +116,7 @@ class _TripScreenState extends State<TripScreen> {
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () async {
               await _dbHelper.deleteTrip(_trip.id);
-              _eDispatcher.emit(EventDispatcher.eventTripRemoved, { 'trip': _trip });
+              _eDispatcher.emit(Event.TripRemoved, { 'trip': _trip });
               Navigator.pop(context);
             },
           ),

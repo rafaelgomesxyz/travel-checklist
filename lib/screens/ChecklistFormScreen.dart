@@ -3,6 +3,7 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/models/Checklist.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
+import 'package:travel_checklist/enums.dart';
 
 class ChecklistFormScreen extends StatefulWidget {
   final Checklist checklist;
@@ -132,7 +133,7 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
               checklist.name = _nameController.text;
               checklist.forPlaces = _forPlaces;
               checklist.id = await _dbHelper.insertChecklist(checklist);
-              _eDispatcher.emit(EventDispatcher.eventChecklistAdded, { 'checklist': checklist});
+              _eDispatcher.emit(Event.ChecklistAdded, { 'checklist': checklist});
             } else {
               widget.checklist.name = _nameController.text;
               widget.checklist.forPlaces = _forPlaces;

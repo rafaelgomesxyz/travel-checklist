@@ -7,6 +7,7 @@ import 'package:travel_checklist/models/ChecklistItem.dart';
 import 'package:travel_checklist/screens/MapScreen.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
+import 'package:travel_checklist/enums.dart';
 
 class ChecklistItemFormScreen extends StatefulWidget {
   final ChecklistItem item;
@@ -151,7 +152,7 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
               item.name = _nameController.text;
               item.coordinates = _coordinates;
               item.id = await _dbHelper.insertChecklistItem(item);
-              _eDispatcher.emit(EventDispatcher.eventChecklistItemAdded, { 'item': item});
+              _eDispatcher.emit(Event.ChecklistItemAdded, { 'item': item});
             } else {
               widget.item.name = _nameController.text;
               widget.item.coordinates = _coordinates;

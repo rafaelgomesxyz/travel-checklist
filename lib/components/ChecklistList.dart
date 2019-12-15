@@ -6,6 +6,7 @@ import 'package:travel_checklist/models/Checklist.dart';
 import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
+import 'package:travel_checklist/enums.dart';
 
 class ChecklistList extends StatefulWidget {
   final Trip trip;
@@ -29,8 +30,8 @@ class _ChecklistListState extends State<ChecklistList> {
   void initState() {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
-    _checklistAddedSubscription = _eDispatcher.listen(EventDispatcher.eventChecklistAdded, _onChecklistAdded);
-    _checklistRemovedSubscription = _eDispatcher.listen(EventDispatcher.eventChecklistRemoved, _onChecklistRemoved);
+    _checklistAddedSubscription = _eDispatcher.listen(Event.ChecklistAdded, _onChecklistAdded);
+    _checklistRemovedSubscription = _eDispatcher.listen(Event.ChecklistRemoved, _onChecklistRemoved);
     _loadChecklists();
   }
 

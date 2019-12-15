@@ -8,6 +8,7 @@ import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/screens/MapScreen.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
+import 'package:travel_checklist/enums.dart';
 
 class TripFormScreen extends StatefulWidget {
   final Trip trip;
@@ -222,7 +223,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 .parse(_timestampController.text)
                 .millisecondsSinceEpoch;
               trip.id = await _dbHelper.insertTrip(trip);
-              _eDispatcher.emit(EventDispatcher.eventTripAdded, { 'trip': trip});
+              _eDispatcher.emit(Event.TripAdded, { 'trip': trip});
             } else {
               widget.trip.name = _nameController.text;
               widget.trip.destination = _destinationController.text;

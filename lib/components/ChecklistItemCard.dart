@@ -3,6 +3,7 @@ import 'package:travel_checklist/models/ChecklistItem.dart';
 import 'package:travel_checklist/screens/ChecklistItemFormScreen.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
+import 'package:travel_checklist/enums.dart';
 
 class ChecklistItemCard extends StatefulWidget {
   final ChecklistItem item;
@@ -70,7 +71,7 @@ class _ChecklistItemCardState extends State<ChecklistItemCard> {
 
   void _updateChecked() async {
     await _dbHelper.updateChecklistItem(widget.item);
-    _eDispatcher.emit(EventDispatcher.eventChecklistItemChecked, { 'item': widget.item });
+    _eDispatcher.emit(Event.ChecklistItemChecked, { 'item': widget.item });
     setState(() {
       _item = widget.item;
     });
@@ -105,7 +106,7 @@ class _ChecklistItemCardState extends State<ChecklistItemCard> {
             label: Text('Deletar Item'),
             onPressed: () async {
               await _dbHelper.deleteChecklistItem(_item.id);
-              _eDispatcher.emit(EventDispatcher.eventChecklistItemRemoved, { 'item': _item });
+              _eDispatcher.emit(Event.ChecklistItemRemoved, { 'item': _item });
               Navigator.pop(_context);
             },
             padding: EdgeInsets.all(0.0),

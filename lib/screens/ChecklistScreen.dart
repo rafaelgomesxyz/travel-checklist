@@ -7,6 +7,7 @@ import 'package:travel_checklist/screens/ChecklistFormScreen.dart';
 import 'package:travel_checklist/screens/ChecklistItemFormScreen.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
+import 'package:travel_checklist/enums.dart';
 
 class ChecklistScreen extends StatefulWidget {
   final Checklist checklist;
@@ -82,7 +83,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () async {
               await _dbHelper.deleteChecklist(_checklist.id);
-              _eDispatcher.emit(EventDispatcher.eventChecklistRemoved, { 'checklist': _checklist });
+              _eDispatcher.emit(Event.ChecklistRemoved, { 'checklist': _checklist });
               Navigator.pop(context);
             },
           ),

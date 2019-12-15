@@ -5,6 +5,7 @@ import 'package:travel_checklist/components/TripCard.dart';
 import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
+import 'package:travel_checklist/enums.dart';
 
 class TripList extends StatefulWidget {
   final int numToShow;
@@ -34,8 +35,8 @@ class _TripListState extends State<TripList> {
     } else {
       _numToShow = 0;
     }
-    _tripAddedSubscription = _eDispatcher.listen(EventDispatcher.eventTripAdded, _loadTrips);
-    _tripRemovedSubscription = _eDispatcher.listen(EventDispatcher.eventTripRemoved, _loadTrips);
+    _tripAddedSubscription = _eDispatcher.listen(Event.TripAdded, _loadTrips);
+    _tripRemovedSubscription = _eDispatcher.listen(Event.TripRemoved, _loadTrips);
     _loadTrips({});
   }
 
