@@ -25,6 +25,8 @@ class _TripFormScreenState extends State<TripFormScreen> {
   bool _isCreating = true;
   String _title = '';
   String _destinationCoordinates = '';
+  DateTime _departureDate;
+  DateTime _returnDate;
   Template _template = Template.Outro;
 
   final _dbHelper = DatabaseHelper.instance;
@@ -33,7 +35,8 @@ class _TripFormScreenState extends State<TripFormScreen> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _destinationController = TextEditingController();
-  TextEditingController _timestampController = TextEditingController();
+  TextEditingController _departureTimestampController = TextEditingController();
+  TextEditingController _returnTimestampController = TextEditingController();
 
   @override
   void initState() {
@@ -47,7 +50,8 @@ class _TripFormScreenState extends State<TripFormScreen> {
   void dispose() {
     _nameController.dispose();
     _destinationController.dispose();
-    _timestampController.dispose();
+    _departureTimestampController.dispose();
+    _returnTimestampController.dispose();
     super.dispose();
   }
 
@@ -146,11 +150,11 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 },
               ),
               TextFormField(
-                controller: _timestampController,
+                controller: _departureTimestampController,
                 decoration: InputDecoration(
                   errorStyle: TextStyle(fontSize: 15.0),
                   labelStyle: TextStyle(color: Colors.blueAccent),
-                  labelText: 'Data',
+                  labelText: 'Data de Ida',
                 ),
                 keyboardType: TextInputType.text,
                 style: TextStyle(
@@ -163,7 +167,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
                     return 'Selecione uma data!';
                   }
                   try {
-                    _dateFormat.parse(_timestampController.text);
+                    _dateFormat.parse(_departureTimestampController.text);
                   } catch (err) {
                     return 'Data inválida!';
                   }
@@ -178,12 +182,62 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 onPressed: () {
                   DatePicker.showDateTimePicker(
                     context,
-                    currentTime: now,
+                    currentTime: _departureDate.millisecondsSinceEpoch <= now.millisecondsSinceEpoch ? now.add(Duration(minutes: 1)) : _departureDate,
                     locale: LocaleType.pt,
-                    minTime: now.subtract(Duration(seconds: 1)),
+                    minTime: now,
                     onConfirm: (date) {
                       setState(() {
-                        _timestampController.text = _dateFormat.format(date);
+                        _departureDate = date;
+                        _departureTimestampController.text = _dateFormat.format(_departureDate);
+                        if (_returnDate.millisecondsSinceEpoch <= _departureDate.millisecondsSinceEpoch) {
+                          _returnDate = _departureDate.add(Duration(minutes: 2));
+                        }
+                      });
+                    },
+                    showTitleActions: true,
+                  );
+                },
+              ),
+              TextFormField(
+                controller: _returnTimestampController,
+                decoration: InputDecoration(
+                  errorStyle: TextStyle(fontSize: 15.0),
+                  labelStyle: TextStyle(color: Colors.blueAccent),
+                  labelText: 'Data de Volta',
+                ),
+                keyboardType: TextInputType.text,
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                  fontSize: 20.0,
+                ),
+                textAlign: TextAlign.left,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Selecione uma data!';
+                  }
+                  try {
+                    _dateFormat.parse(_returnTimestampController.text);
+                  } catch (err) {
+                    return 'Data inválida!';
+                  }
+                  return null;
+                },
+              ),
+              FlatButton.icon(
+                color: Colors.blueAccent,
+                textColor: Colors.white,
+                icon: Icon(Icons.calendar_today),
+                label: Text('Selecionar Data'),
+                onPressed: () {
+                  DatePicker.showDateTimePicker(
+                    context,
+                    currentTime: _returnDate,
+                    locale: LocaleType.pt,
+                    minTime: _departureDate.add(Duration(minutes: 1)),
+                    onConfirm: (date) {
+                      setState(() {
+                        _returnDate = date;
+                        _returnTimestampController.text = _dateFormat.format(_returnDate);
                       });
                     },
                     showTitleActions: true,
@@ -219,18 +273,16 @@ class _TripFormScreenState extends State<TripFormScreen> {
               trip.name = _nameController.text;
               trip.destination = _destinationController.text;
               trip.destinationCoordinates = _destinationCoordinates;
-              trip.timestamp = _dateFormat
-                .parse(_timestampController.text)
-                .millisecondsSinceEpoch;
+              trip.departureTimestamp = _departureDate.millisecondsSinceEpoch;
+              trip.returnTimestamp = _returnDate.millisecondsSinceEpoch;
               trip.id = await _dbHelper.insertTrip(trip, _template);
               _eDispatcher.emit(Event.TripAdded, { 'trip': trip});
             } else {
               widget.trip.name = _nameController.text;
               widget.trip.destination = _destinationController.text;
               widget.trip.destinationCoordinates = _destinationCoordinates;
-              widget.trip.timestamp = _dateFormat
-                .parse(_timestampController.text)
-                .millisecondsSinceEpoch;
+              widget.trip.departureTimestamp = _departureDate.millisecondsSinceEpoch;
+              widget.trip.returnTimestamp = _returnDate.millisecondsSinceEpoch;
               await _dbHelper.updateTrip(widget.trip);
             }
             Navigator.pop(context);
@@ -259,7 +311,10 @@ class _TripFormScreenState extends State<TripFormScreen> {
         _nameController.text = '';
         _destinationController.text = '';
         _destinationCoordinates = '';
-        _timestampController.text = '';
+        _departureDate = DateTime.now().add(Duration(minutes: 1));
+        _returnDate = _departureDate.add(Duration(minutes: 2));
+        _departureTimestampController.text = '';
+        _returnTimestampController.text = '';
       } else {
         _isCreating = false;
         _template = Template.Outro;
@@ -267,7 +322,10 @@ class _TripFormScreenState extends State<TripFormScreen> {
         _nameController.text = widget.trip.name;
         _destinationController.text = widget.trip.destination;
         _destinationCoordinates = widget.trip.destinationCoordinates;
-        _timestampController.text = _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(widget.trip.timestamp));
+        _departureDate = DateTime.fromMillisecondsSinceEpoch(widget.trip.departureTimestamp);
+        _returnDate = DateTime.fromMillisecondsSinceEpoch(widget.trip.returnTimestamp);
+        _departureTimestampController.text = _dateFormat.format(_departureDate);
+        _returnTimestampController.text = _dateFormat.format(_returnDate);
       }
     });
   }

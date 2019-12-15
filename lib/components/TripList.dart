@@ -103,10 +103,10 @@ class _TripListState extends State<TripList> {
 
   void _sortList(List<Trip> trips) {
     trips.sort((Trip a, Trip b) {
-      if (a.timestamp > b.timestamp) {
+      if (a.departureTimestamp > b.departureTimestamp) {
         return 1;
       }
-      if (b.timestamp > a.timestamp) {
+      if (b.departureTimestamp > a.departureTimestamp) {
         return -1;
       }
       return 0;

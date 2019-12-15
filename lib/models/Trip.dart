@@ -5,7 +5,8 @@ class Trip {
   String name = '';
   String destination = '';
   String destinationCoordinates = '';
-  int timestamp = 0;
+  int departureTimestamp = 0;
+  int returnTimestamp = 0;
   List<Checklist> checklists = [];
 
   Trip();

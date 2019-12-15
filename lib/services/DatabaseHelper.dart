@@ -23,7 +23,8 @@ class DatabaseHelper {
   static final columnForPlaces = 'for_places';
   static final columnDestination = 'destination';
   static final columnDestinationCoordinates = 'destination_coordinates';
-  static final columnTimestamp = 'timestamp';
+  static final columnDepartureTimestamp = 'departure_timestamp';
+  static final columnReturnTimestamp = 'return_timestamp';
 
   static final schemaChecklistItem = '''
     CREATE TABLE $tableChecklistItem (
@@ -48,7 +49,8 @@ class DatabaseHelper {
       $columnName VARCHAR(255) NOT NULL,
       $columnDestination VARCHAR(255) NOT NULL,
       $columnDestinationCoordinates VARCHAR(63) NOT NULL,
-      $columnTimestamp INTEGER NOT NULL
+      $columnDepartureTimestamp INTEGER NOT NULL,
+      $columnReturnTimestamp INTEGER NOT NULL
     )
   ''';
 
@@ -103,7 +105,8 @@ class DatabaseHelper {
     row[columnName] = trip.name;
     row[columnDestination] = trip.destination;
     row[columnDestinationCoordinates] = trip.destinationCoordinates;
-    row[columnTimestamp] = trip.timestamp;
+    row[columnDepartureTimestamp] = trip.departureTimestamp;
+    row[columnReturnTimestamp] = trip.returnTimestamp;
     int tripId = await db.insert(tableTrip, row);
 
     // Fill trip with predefined checklists based on template.
@@ -152,7 +155,8 @@ class DatabaseHelper {
     row[columnName] = trip.name;
     row[columnDestination] = trip.destination;
     row[columnDestinationCoordinates] = trip.destinationCoordinates;
-    row[columnTimestamp] = trip.timestamp;
+    row[columnDepartureTimestamp] = trip.departureTimestamp;
+    row[columnReturnTimestamp] = trip.returnTimestamp;
     return await db.update(tableTrip, row, where: '$columnId = ?', whereArgs: [trip.id]);
   }
 
@@ -203,7 +207,8 @@ class DatabaseHelper {
       trip.name = row[columnName];
       trip.destination = row[columnDestination];
       trip.destinationCoordinates = row[columnDestinationCoordinates];
-      trip.timestamp = row[columnTimestamp];
+      trip.departureTimestamp = row[columnDepartureTimestamp];
+      trip.returnTimestamp = row[columnReturnTimestamp];
       trips.add(trip);
     }
     return trips;

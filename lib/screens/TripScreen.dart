@@ -38,7 +38,8 @@ class _TripScreenState extends State<TripScreen> {
 
   @override
   Widget build(BuildContext context) {
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(_trip.timestamp);
+    DateTime departureDate = DateTime.fromMillisecondsSinceEpoch(_trip.departureTimestamp);
+    DateTime returnDate = DateTime.fromMillisecondsSinceEpoch(_trip.returnTimestamp);
     return Scaffold(
       appBar: AppBar(
         title: Text(_trip.name),
@@ -64,12 +65,27 @@ class _TripScreenState extends State<TripScreen> {
             child: Row(
               children: <Widget> [
                 Text(
-                  'DATA',
+                  'IDA',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text('${_dateFormat.format(date)} (${timeago.format(date, locale: 'pt_BR', allowFromNow: true)})'),
+                Text('${_dateFormat.format(departureDate)} (${timeago.format(departureDate, locale: 'pt_BR', allowFromNow: true)})'),
+              ],
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ),
+            margin: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
+          ),
+          Container(
+            child: Row(
+              children: <Widget> [
+                Text(
+                  'VOLTA',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text('${_dateFormat.format(returnDate)} (${timeago.format(returnDate, locale: 'pt_BR', allowFromNow: true)})'),
               ],
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
             ),

@@ -51,7 +51,7 @@ class _TripCardState extends State<TripCard> {
                   Row(
                     children: <Widget> [
                       Text(
-                        timeago.format(DateTime.fromMillisecondsSinceEpoch(_trip.timestamp), locale: 'pt_BR', allowFromNow: true),
+                        timeago.format(DateTime.fromMillisecondsSinceEpoch(_trip.departureTimestamp), locale: 'pt_BR', allowFromNow: true),
                       ),
                       Icon(Icons.access_time),
                     ],
