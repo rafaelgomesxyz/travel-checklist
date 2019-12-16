@@ -52,7 +52,7 @@ class _TripListScreenState extends State<TripListScreen> {
             },
           ),
           SpeedDialChild(
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.blue,
             child: Icon(Icons.location_city),
             label: 'CIDADE',
             labelStyle: TextStyle(fontSize: 18.0),
@@ -61,7 +61,7 @@ class _TripListScreenState extends State<TripListScreen> {
             },
           ),
           SpeedDialChild(
-            backgroundColor: Colors.blue,
+            backgroundColor: Colors.green,
             child: Icon(Icons.local_florist),
             label: 'CAMPO',
             labelStyle: TextStyle(fontSize: 18.0),
