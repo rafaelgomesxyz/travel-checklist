@@ -1,22 +1,26 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:travel_checklist/components/TripCard.dart';
 import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
 import 'package:travel_checklist/enums.dart';
+import 'package:travel_checklist/services/NotificationManager.dart';
 
 class TripList extends StatefulWidget {
+  final bool notificationsOnly;
   final int numToShow;
 
-  TripList({ Key key, this.numToShow }) : super(key: key);
+  TripList({ Key key, this.notificationsOnly, this.numToShow }) : super(key: key);
 
   @override
   _TripListState createState() => _TripListState();
 }
 
 class _TripListState extends State<TripList> {
+  bool _notificationsOnly = false;
   int _numToShow;
 
   StreamController<List<Trip>> _listController = StreamController<List<Trip>>();
@@ -30,6 +34,9 @@ class _TripListState extends State<TripList> {
   void initState() {
     super.initState();
     timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
+    if (widget.notificationsOnly != null) {
+      _notificationsOnly = widget.notificationsOnly;
+    }
     if (widget.numToShow != null) {
       _numToShow = widget.numToShow;
     } else {
@@ -97,7 +104,16 @@ class _TripListState extends State<TripList> {
   }
 
   void _loadTrips(Map<String, dynamic> unused) async {
-    List<Trip> trips = await _dbHelper.getTrips();
+    List<Trip> trips = [];
+    if (_notificationsOnly) {
+      List<PendingNotificationRequest> notifications = await NotificationManager.instance.getNotifications();
+      for (PendingNotificationRequest notification in notifications) {
+        Trip trip = await _dbHelper.getTrip(notification.id);
+        trips.add(trip);
+      }
+    } else {
+      trips = await _dbHelper.getTrips();
+    }
     _listController.sink.add(trips);
   }
 

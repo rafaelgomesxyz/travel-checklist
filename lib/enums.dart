@@ -17,6 +17,7 @@ enum Screen {
   Checklist,
   Home,
   Map,
+  Notifications,
   Settings,
   TripForm,
   TripList,

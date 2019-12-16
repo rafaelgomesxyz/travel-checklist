@@ -10,6 +10,7 @@ import 'package:travel_checklist/screens/MapScreen.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
 import 'package:travel_checklist/enums.dart';
+import 'package:travel_checklist/services/NotificationManager.dart';
 import 'package:travel_checklist/services/WillPopDialogs.dart';
 
 class TripFormScreen extends StatefulWidget {
@@ -30,6 +31,8 @@ class _TripFormScreenState extends State<TripFormScreen> {
   String _destinationCoordinates = '';
   DateTime _departureDate;
   DateTime _returnDate;
+  DateTime _notificationDate;
+  bool _doNotify = false;
   Template _template = Template.Outro;
 
   final _dbHelper = DatabaseHelper.instance;
@@ -40,6 +43,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
   TextEditingController _destinationController = TextEditingController();
   TextEditingController _departureTimestampController = TextEditingController();
   TextEditingController _returnTimestampController = TextEditingController();
+  TextEditingController _notificationHoursController = TextEditingController();
 
   @override
   void initState() {
@@ -55,6 +59,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
     _destinationController.dispose();
     _departureTimestampController.dispose();
     _returnTimestampController.dispose();
+    _notificationHoursController.dispose();
     super.dispose();
   }
 
@@ -264,6 +269,73 @@ class _TripFormScreenState extends State<TripFormScreen> {
                     );
                   },
                 ),
+                Row(
+                  children: <Widget> [
+                    Checkbox(
+                      onChanged: (bool isChecked) {
+                        _hasModified = true;
+                        setState(() {
+                          _doNotify = isChecked;
+                        });
+                      },
+                      value: _doNotify,
+                    ),
+                    Text(
+                      'Mostrar notificação.',
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Visibility(
+                  child: Container(
+                    child: Text('Quantas horas antes da viagem deseja receber a notificação?'),
+                  ),
+                  visible: _doNotify,
+                ),
+                Visibility(
+                  child: TextFormField(
+                    controller: _notificationHoursController,
+                    decoration: InputDecoration(
+                      errorStyle: TextStyle(fontSize: 15.0),
+                      labelStyle: TextStyle(color: Colors.blueAccent),
+                      labelText: 'Horas',
+                    ),
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(
+                      color: Colors.blueAccent,
+                      fontSize: 20.0,
+                    ),
+                    textAlign: TextAlign.left,
+                    validator: (value) {
+                      if (!_doNotify) {
+                        return null;
+                      }
+                      if (value.isEmpty) {
+                        return 'Digite as horas!';
+                      }
+                      try {
+                        int value = int.parse(_notificationHoursController.text);
+                        if (value <= 0) {
+                          return 'Horas inválidas!';
+                        }
+                        _notificationDate = _departureDate.subtract(Duration(hours: value));
+                        if (_notificationDate.millisecondsSinceEpoch <= DateTime.now().millisecondsSinceEpoch) {
+                          return 'A data da notificação deve estar no futuro.';
+                        }
+                      } catch (err) {
+                        return 'Horas inválidas!';
+                      }
+                      return null;
+                    },
+                    onChanged: (String text) {
+                      _hasModified = true;
+                    },
+                  ),
+                  visible: _doNotify,
+                ),
                 _buildButton(),
               ],
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -297,15 +369,38 @@ class _TripFormScreenState extends State<TripFormScreen> {
               trip.destinationCoordinates = _destinationCoordinates;
               trip.departureTimestamp = _departureDate.millisecondsSinceEpoch;
               trip.returnTimestamp = _returnDate.millisecondsSinceEpoch;
+              trip.notificationHours = _doNotify ? int.parse(_notificationHoursController.text) : 0;
               trip.id = await _dbHelper.insertTrip(trip, _template);
               _eDispatcher.emit(Event.TripAdded, { 'trip': trip});
+
+              // Schedule notification.
+              if (_doNotify) {
+                await NotificationManager.instance.scheduleNotification(
+                  trip.id,
+                  'Tudo pronto para ${trip.name}?',
+                  'Sua viagem começa em ${trip.notificationHours} hora${widget.trip.notificationHours > 1 ? 's' : ''}!',
+                  _notificationDate,
+                );
+              }
             } else {
               widget.trip.name = _nameController.text;
               widget.trip.destination = _destinationController.text;
               widget.trip.destinationCoordinates = _destinationCoordinates;
               widget.trip.departureTimestamp = _departureDate.millisecondsSinceEpoch;
               widget.trip.returnTimestamp = _returnDate.millisecondsSinceEpoch;
+              widget.trip.notificationHours = _doNotify ? int.parse(_notificationHoursController.text) : 0;
               await _dbHelper.updateTrip(widget.trip);
+
+              // Cancel previous notification and schedule new one.
+              await NotificationManager.instance.cancelNotification(widget.trip.id);
+              if (_doNotify) {
+                await NotificationManager.instance.scheduleNotification(
+                  widget.trip.id,
+                  'Tudo pronto para ${widget.trip.name}?',
+                  'Sua viagem começa em ${widget.trip.notificationHours} hora${widget.trip.notificationHours > 1 ? 's' : ''}!',
+                  _notificationDate,
+                );
+              }
             }
             Navigator.pop(context);
           }
@@ -338,6 +433,8 @@ class _TripFormScreenState extends State<TripFormScreen> {
         _returnDate = _departureDate.add(Duration(minutes: 2));
         _departureTimestampController.text = '';
         _returnTimestampController.text = '';
+        _notificationHoursController.text = '';
+        _doNotify = false;
       } else {
         _isCreating = false;
         _template = Template.Outro;
@@ -349,6 +446,8 @@ class _TripFormScreenState extends State<TripFormScreen> {
         _returnDate = DateTime.fromMillisecondsSinceEpoch(widget.trip.returnTimestamp);
         _departureTimestampController.text = _dateFormat.format(_departureDate);
         _returnTimestampController.text = _dateFormat.format(_returnDate);
+        _notificationHoursController.text = widget.trip.notificationHours.toString();
+        _doNotify = widget.trip.notificationHours > 0;
       }
     });
   }

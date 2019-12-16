@@ -25,6 +25,7 @@ class DatabaseHelper {
   static final columnDestinationCoordinates = 'destination_coordinates';
   static final columnDepartureTimestamp = 'departure_timestamp';
   static final columnReturnTimestamp = 'return_timestamp';
+  static final columnNotificationHours = 'notification_hours';
 
   static final schemaChecklistItem = '''
     CREATE TABLE $tableChecklistItem (
@@ -50,7 +51,8 @@ class DatabaseHelper {
       $columnDestination VARCHAR(255) NOT NULL,
       $columnDestinationCoordinates VARCHAR(63) NOT NULL,
       $columnDepartureTimestamp INTEGER NOT NULL,
-      $columnReturnTimestamp INTEGER NOT NULL
+      $columnReturnTimestamp INTEGER NOT NULL,
+      $columnNotificationHours INTEGER NOT NULL
     )
   ''';
 
@@ -107,6 +109,7 @@ class DatabaseHelper {
     row[columnDestinationCoordinates] = trip.destinationCoordinates;
     row[columnDepartureTimestamp] = trip.departureTimestamp;
     row[columnReturnTimestamp] = trip.returnTimestamp;
+    row[columnNotificationHours] = trip.notificationHours;
     int tripId = await db.insert(tableTrip, row);
 
     // Fill trip with predefined checklists based on template.
@@ -157,7 +160,56 @@ class DatabaseHelper {
     row[columnDestinationCoordinates] = trip.destinationCoordinates;
     row[columnDepartureTimestamp] = trip.departureTimestamp;
     row[columnReturnTimestamp] = trip.returnTimestamp;
+    row[columnNotificationHours] = trip.notificationHours;
     return await db.update(tableTrip, row, where: '$columnId = ?', whereArgs: [trip.id]);
+  }
+
+  Future<ChecklistItem> getChecklistItem(int id) async {
+    Database db = await instance.database;
+    Map<String, dynamic> row = (await db.rawQuery('SELECT * FROM $tableChecklistItem WHERE $columnId = $id')).first;
+    ChecklistItem item = ChecklistItem();
+    item.id = row[columnId];
+    item.checklist = row[tableChecklist];
+    item.name = row[columnName];
+    item.coordinates = row[columnCoordinates] ?? '';
+    item.isChecked = row[columnIsChecked] == 1;
+    return item;
+  }
+
+  Future<Checklist> getChecklist(int id) async {
+    Database db = await instance.database;
+    Map<String, dynamic> row = (await db.rawQuery(
+      'SELECT * FROM $tableChecklist WHERE $columnId = $id')).first;
+    Checklist checklist = Checklist();
+    checklist.id = row[columnId];
+    checklist.trip = row[tableTrip];
+    checklist.name = row[columnName];
+    checklist.forPlaces = row[columnForPlaces] == 1;
+    checklist.checkedItems = Sqflite.firstIntValue(
+      await db.rawQuery(
+        'SELECT COUNT(*) FROM $tableChecklistItem WHERE $tableChecklist = ${checklist
+          .id} AND $columnIsChecked = 1')
+    );
+    checklist.totalItems = Sqflite.firstIntValue(
+      await db.rawQuery(
+        'SELECT COUNT(*) FROM $tableChecklistItem WHERE $tableChecklist = ${checklist
+          .id}')
+    );
+    return checklist;
+  }
+
+  Future<Trip> getTrip(int id) async {
+    Database db = await instance.database;
+    Map<String, dynamic> row = (await db.rawQuery('SELECT * FROM $tableTrip WHERE $columnId = $id')).first;
+    Trip trip = Trip();
+    trip.id = row[columnId];
+    trip.name = row[columnName];
+    trip.destination = row[columnDestination];
+    trip.destinationCoordinates = row[columnDestinationCoordinates];
+    trip.departureTimestamp = row[columnDepartureTimestamp];
+    trip.returnTimestamp = row[columnReturnTimestamp];
+    trip.notificationHours = row[columnNotificationHours];
+    return trip;
   }
 
   Future<List<ChecklistItem>> getChecklistItems(int checklist) async {
@@ -209,6 +261,7 @@ class DatabaseHelper {
       trip.destinationCoordinates = row[columnDestinationCoordinates];
       trip.departureTimestamp = row[columnDepartureTimestamp];
       trip.returnTimestamp = row[columnReturnTimestamp];
+      trip.notificationHours = row[columnNotificationHours];
       trips.add(trip);
     }
     return trips;

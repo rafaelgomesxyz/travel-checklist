@@ -1,9 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:travel_checklist/screens/HomeScreen.dart';
+import 'package:travel_checklist/services/NotificationManager.dart';
 import 'package:travel_checklist/services/PreferencesManager.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -76,6 +76,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   void _init() async {
     await PreferencesManager.instance.init();
+    await NotificationManager.instance.init(context);
     await initializeDateFormatting('pt_BR', null);
     Timer(Duration(seconds: 2), () {
       Navigator.push(context, MaterialPageRoute(builder: (_context) => HomeScreen(title: widget.title)));
