@@ -10,7 +10,7 @@ import 'package:travel_checklist/screens/MapScreen.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
 import 'package:travel_checklist/enums.dart';
-import 'package:travel_checklist/services/NotificationManager.dart';
+//import 'package:travel_checklist/services/NotificationManager.dart';
 import 'package:travel_checklist/services/WillPopDialogs.dart';
 
 class TripFormScreen extends StatefulWidget {
@@ -269,7 +269,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
                     );
                   },
                 ),
-                Row(
+                /*Row(
                   children: <Widget> [
                     Checkbox(
                       onChanged: (bool isChecked) {
@@ -335,7 +335,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
                     },
                   ),
                   visible: _doNotify,
-                ),
+                ),*/
                 _buildButton(),
               ],
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -374,14 +374,14 @@ class _TripFormScreenState extends State<TripFormScreen> {
               _eDispatcher.emit(Event.TripAdded, { 'trip': trip});
 
               // Schedule notification.
-              if (_doNotify) {
+              /*if (_doNotify) {
                 await NotificationManager.instance.scheduleNotification(
                   trip.id,
                   'Tudo pronto para ${trip.name}?',
                   'Sua viagem começa em ${trip.notificationHours} hora${trip.notificationHours > 1 ? 's' : ''}!',
                   _notificationDate,
                 );
-              }
+              }*/
             } else {
               widget.trip.name = _nameController.text;
               widget.trip.destination = _destinationController.text;
@@ -392,7 +392,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
               await _dbHelper.updateTrip(widget.trip);
 
               // Cancel previous notification and schedule new one.
-              await NotificationManager.instance.cancelNotification(widget.trip.id);
+              /*await NotificationManager.instance.cancelNotification(widget.trip.id);
               if (_doNotify) {
                 await NotificationManager.instance.scheduleNotification(
                   widget.trip.id,
@@ -400,7 +400,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
                   'Sua viagem começa em ${widget.trip.notificationHours} hora${widget.trip.notificationHours > 1 ? 's' : ''}!',
                   _notificationDate,
                 );
-              }
+              }*/
             }
             Navigator.pop(context);
           }

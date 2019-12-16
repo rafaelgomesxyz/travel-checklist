@@ -6,7 +6,7 @@ import 'package:travel_checklist/screens/TripScreen.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
 import 'package:travel_checklist/enums.dart';
-import 'package:travel_checklist/services/NotificationManager.dart';
+//import 'package:travel_checklist/services/NotificationManager.dart';
 
 class TripCard extends StatefulWidget {
   final Trip trip;
@@ -136,7 +136,7 @@ class _TripCardState extends State<TripCard> {
           FlatButton(
             child: Text('Sim'),
             onPressed: () async {
-              await NotificationManager.instance.cancelNotification(_trip.id);
+              //await NotificationManager.instance.cancelNotification(_trip.id);
               await _dbHelper.deleteTrip(_trip.id);
               _eDispatcher.emit(Event.TripRemoved, { 'trip': _trip });
               Navigator.pop(_context);

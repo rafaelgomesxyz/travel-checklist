@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:travel_checklist/screens/HomeScreen.dart';
-import 'package:travel_checklist/screens/NotificationsScreen.dart';
+//import 'package:travel_checklist/screens/NotificationsScreen.dart';
 import 'package:travel_checklist/screens/SettingsScreen.dart';
 import 'package:travel_checklist/enums.dart';
 import 'package:travel_checklist/screens/TripListScreen.dart';
@@ -64,7 +64,7 @@ class AppDrawer extends StatelessWidget {
             },
             title: Text('Viagens'),
           ),
-          ListTile(
+          /*ListTile(
             leading: Icon(Icons.notifications),
             onTap: () {
               if (currentScreen == Screen.Notifications) {
@@ -74,7 +74,7 @@ class AppDrawer extends StatelessWidget {
               }
             },
             title: Text('Notificações'),
-          ),
+          ),*/
           ListTile(
             leading: Icon(Icons.settings),
             onTap: () {

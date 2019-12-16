@@ -7,7 +7,7 @@ import 'package:travel_checklist/models/Trip.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
 import 'package:travel_checklist/enums.dart';
-import 'package:travel_checklist/services/NotificationManager.dart';
+//import 'package:travel_checklist/services/NotificationManager.dart';
 import 'package:travel_checklist/services/PreferencesManager.dart';
 
 class TripList extends StatefulWidget {
@@ -107,11 +107,11 @@ class _TripListState extends State<TripList> {
     DateTime now = DateTime.now();
     List<Trip> trips = [];
     if (_notificationsOnly) {
-      List<PendingNotificationRequest> notifications = await NotificationManager.instance.getNotifications();
+      /*List<PendingNotificationRequest> notifications = await NotificationManager.instance.getNotifications();
       for (PendingNotificationRequest notification in notifications) {
         Trip trip = await _dbHelper.getTrip(notification.id);
         trips.add(trip);
-      }
+      }*/
     } else {
       trips = await _dbHelper.getTrips();
       if (_numToShow > 0) {
