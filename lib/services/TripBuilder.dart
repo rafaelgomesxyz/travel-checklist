@@ -152,7 +152,7 @@ class TripBuilder {
             'Paletó',
             'Casaco',
             'Luvas',
-            'Vestido,
+            'Vestido',
           ],
         };
       case Template.Outro:
