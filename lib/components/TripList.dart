@@ -8,6 +8,7 @@ import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
 import 'package:travel_checklist/enums.dart';
 import 'package:travel_checklist/services/NotificationManager.dart';
+import 'package:travel_checklist/services/PreferencesManager.dart';
 
 class TripList extends StatefulWidget {
   final bool notificationsOnly;
@@ -62,7 +63,6 @@ class _TripListState extends State<TripList> {
         builder: (BuildContext _context, AsyncSnapshot<List<Trip>> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data.length > 0) {
-              _sortList(snapshot.data);
               return ListView.builder(
                 itemBuilder: (BuildContext __context, int index) {
                   Trip trip = snapshot.data[index];
@@ -104,6 +104,7 @@ class _TripListState extends State<TripList> {
   }
 
   void _loadTrips(Map<String, dynamic> unused) async {
+    DateTime now = DateTime.now();
     List<Trip> trips = [];
     if (_notificationsOnly) {
       List<PendingNotificationRequest> notifications = await NotificationManager.instance.getNotifications();
@@ -114,7 +115,6 @@ class _TripListState extends State<TripList> {
     } else {
       trips = await _dbHelper.getTrips();
       if (_numToShow > 0) {
-        DateTime now = DateTime.now();
         List<Trip> filteredTrips = [];
         for (Trip trip in trips) {
           if (trip.departureTimestamp > now.millisecondsSinceEpoch) {
@@ -127,24 +127,37 @@ class _TripListState extends State<TripList> {
         }
       }
     }
+    bool removePastTrips = PreferencesManager.instance.settings[PreferencesManager.settingRemovePastTrips]['value'];
+    List<Trip> filteredTrips = [];
+    for (Trip trip in trips) {
+      if (trip.departureTimestamp <= now.millisecondsSinceEpoch) {
+        if (removePastTrips) {
+          await _dbHelper.deleteTrip(trip.id);
+        } else {
+          trip.isPast = true;
+          filteredTrips.add(trip);
+        }
+      } else {
+        filteredTrips.add(trip);
+      }
+    }
+    trips = filteredTrips;
+    _sortList(trips);
     _listController.sink.add(trips);
   }
 
   void _sortList(List<Trip> trips) {
-    DateTime now = DateTime.now();
     trips.sort((Trip a, Trip b) {
+      if (a.isPast && !b.isPast) {
+        return 1;
+      }
+      if (b.isPast && !a.isPast) {
+        return -1;
+      }
       if (a.departureTimestamp > b.departureTimestamp) {
-        if (b.departureTimestamp <= now.millisecondsSinceEpoch) {
-          b.isPast = true;
-          return -1;
-        }
         return 1;
       }
       if (b.departureTimestamp > a.departureTimestamp) {
-        if (a.departureTimestamp <= now.millisecondsSinceEpoch) {
-          a.isPast = true;
-          return 1;
-        }
         return -1;
       }
       return 0;
