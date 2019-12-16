@@ -6,24 +6,13 @@ class TripBuilder {
 
   Map<String, List<String>> getPredefinedChecklists(Template template) {
     Map<String, List<String>> common = {
-      'Acessórios': [
-        'Bolsa',
-        'Câmera fotográfica',
-        'Carregador de celular',
-        'Carregador portátil',
-        'Cartões de crédito',
-        'Carteira',
-        'Carteira de habilitação',
-        'Dinheiro',
-        'Documentos pessoais',
-        'Fones de ouvido',
-        'Lanches',
-        'Óculos escuros',
-        'Relógio',
-        'Remédios',
-        'RG',
+      '01. Etapas da Viagem': [
+        '01. Passaporte',
+        '02. Visto',
+        '03. Passagem',
+        '04. Check-in',
       ],
-      'Higiene Pessoal': [
+      '02. Higiene Pessoal': [
         'Absorvente',
         'Algodão',
         'Condicionador',
@@ -42,7 +31,7 @@ class TripBuilder {
         'Protetor Solar',
         'Shampoo',
       ],
-      'Vestuário': [
+      '03. Vestuário': [
         'Anéis',
         'Blusas',
         'Calças'
@@ -58,12 +47,47 @@ class TripBuilder {
         'Suspensórios',
         'Roupa íntima',
       ],
+      '04. Acessórios': [
+        'Bolsa',
+        'Câmera fotográfica',
+        'Carregador de celular',
+        'Carregador portátil',
+        'Cartões de crédito',
+        'Carteira',
+        'Carteira de habilitação',
+        'Dinheiro',
+        'Documentos pessoais',
+        'Fones de ouvido',
+        'Lanches',
+        'Óculos escuros',
+        'Relógio',
+        'Remédios',
+        'RG',
+      ],
     };
     switch (template) {
       case Template.Praia:
         return {
-          'Acessórios': [
-            ...common['Acessórios'],
+          '01. Etapas da Viagem': [
+            ...common['01. Etapas da Viagem'],
+          ],
+          '02. Higiene Pessoal': [
+            ...common['02. Higiene Pessoal'],
+            'Bronzeador',
+            'Pós-sol',
+            'Protetor Solar',
+            'Protetor labial',
+            'Toalha de banho',
+          ],
+          '03. Vestuário': [
+            ...common['03. Vestuário'],
+            'Roupa de banho',
+            'Short',
+            'Camiseta regata',
+            'Saída de praia',
+          ],
+          '04. Acessórios': [
+            ...common['04. Acessórios'],
             'Bebidas',
             'Bóia',
             'Bola de futebol',
@@ -71,30 +95,33 @@ class TripBuilder {
             'Chapéu',
             'Guarda Sol',
           ],
-          'Higiene Pessoal': [
-            ...common['Higiene Pessoal'],
-            'Bronzeador',
-            'Pós-sol',
-            'Protetor Solar',
-            'Protetor labial',
-            'Toalha de banho',
-          ],
-          'Vestuário': [
-            ...common['Vestuário'],
-            'Roupa de banho',
-            'Short',
-            'Camiseta regata',
-            'Saída de praia',
-          ],
         };
       case Template.Campo:
         return {
-          'Acessórios': [
-            ...common['Acessórios'],
+          '01. Etapas da Viagem': [
+            ...common['01. Etapas da Viagem'],
+          ],
+          '02. Higiene Pessoal': [
+            ...common['02. Higiene Pessoal'],
+            'Antisséptico',
+            'Repelente de insetos',
+            'Sabonete',
+            'Toalha de banho',
+            'Toalha de rosto',  
+          ],
+          '03. Vestuário': [
+            ...common['03. Vestuário'],
+            'Bota impermeável',
+            'Casacos',
+            'Camisa de manga longa',
+            'Sapatos fechados',
+          ],
+          '04. Acessórios': [
+            ...common['04. Acessórios'],
             'Abridor de latas',
             'Barraca',
             'Canivete',
-            'Capa de chuva',    
+            'Capa de chuva',
             'Coador de café',
             'Cobertores',
             'Colchão inflável',
@@ -107,44 +134,22 @@ class TripBuilder {
             'Talheres',
             'Travesseiro',
           ],
-          'Higiene Pessoal': [
-            ...common['Higiene Pessoal'],
-            'Antisséptico',
-            'Repelente de insetos',
-            'Sabonete',
-            'Toalha de banho',
-            'Toalha de rosto',  
-          ],
-          'Vestuário': [
-            ...common['Vestuário'],
-            'Bota impermeável',
-            'Casacos',
-            'Camisa de manga longa',
-            'Sapatos fechados',
-          ],
         };
       case Template.Cidade:
         return {
-          'Acessórios': [
-            ...common['Acessórios'],
-            'Adaptador de tomada',
-            'Passaporte',
-            'Porta Dolar',
-            'Reservas impressas',
-            'Vistos',
-            'Voucher de passeios',
-            'Voucher de shows',
+          '01. Etapas da Viagem': [
+            ...common['01. Etapas da Viagem'],
           ],
-          'Higiene Pessoal': [
-            ...common['Higiene Pessoal'],
+          '02. Higiene Pessoal': [
+            ...common['02. Higiene Pessoal'],
             'Barbeador',
             'Chapinha',
             'Demaquilante',
             'Maquiagem',
             'Secador de cabelos',
           ],
-          'Vestuário': [
-            ...common['Vestuário'],
+          '03. Vestuário': [
+            ...common['03. Vestuário'],
             'Boné',
             'Cachecol',
             'Gravatas',
@@ -153,6 +158,16 @@ class TripBuilder {
             'Casaco',
             'Luvas',
             'Vestido',
+          ],
+          '04. Acessórios': [
+            ...common['04. Acessórios'],
+            'Adaptador de tomada',
+            'Passaporte',
+            'Porta Dolar',
+            'Reservas impressas',
+            'Vistos',
+            'Voucher de passeios',
+            'Voucher de shows',
           ],
         };
       case Template.Outro:

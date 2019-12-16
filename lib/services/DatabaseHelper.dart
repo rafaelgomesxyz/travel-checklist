@@ -130,6 +130,11 @@ class DatabaseHelper {
           await this.insertChecklistItem(item);
         }
       }
+      Checklist checklist = Checklist();
+      checklist.trip = tripId;
+      checklist.name = '05. Lugares para Visitar';
+      checklist.forPlaces = true;
+      await this.insertChecklist(checklist);
     }
 
     return tripId;

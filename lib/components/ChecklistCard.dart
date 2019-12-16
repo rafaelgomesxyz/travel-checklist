@@ -55,22 +55,22 @@ class _ChecklistCardState extends State<ChecklistCard> {
             Container(
               child: Row(
                 children: <Widget> [
+                  Text(
+                    _checklist.name,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   Row(
                     children: <Widget> [
                       Visibility(
                         child: Icon(Icons.location_on),
                         visible: _checklist.forPlaces,
                       ),
-                      Text(
-                        _checklist.name,
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      Text('${_checklist.checkedItems}/${_checklist.totalItems}'),
                     ],
                   ),
-                  Text('${_checklist.checkedItems}/${_checklist.totalItems}'),
                 ],
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
               ),
