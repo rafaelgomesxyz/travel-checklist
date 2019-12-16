@@ -9,6 +9,7 @@ import 'package:travel_checklist/screens/MapScreen.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
 import 'package:travel_checklist/enums.dart';
+import 'package:travel_checklist/services/WillPopDialogs.dart';
 
 class ChecklistItemFormScreen extends StatefulWidget {
   final ChecklistItem item;
@@ -22,6 +23,7 @@ class ChecklistItemFormScreen extends StatefulWidget {
 }
 
 class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
+  bool _hasModified = false;
   bool _isCreating = true;
   String _title = '';
   String _coordinates = '';
@@ -48,90 +50,97 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_title),
-        actions: <Widget> [
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              _resetFields();
-            },
-          ),
-        ],
-      ),
-      drawer: AppDrawer(currentScreen: Screen.ChecklistItemForm),
-      body: SingleChildScrollView(
-        child: Form(
-          child: Column(
-            children: <Widget> [
-              Icon(
-                Icons.check_box,
-                size: 50,
-              ),
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  errorStyle: TextStyle(fontSize: 15.0),
-                  labelStyle: TextStyle(color: Colors.blueAccent),
-                  labelText: 'Nome',
+    return WillPopScope(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_title),
+          actions: <Widget> [
+            IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: () {
+                _resetFields();
+              },
+            ),
+          ],
+        ),
+        drawer: AppDrawer(currentScreen: Screen.ChecklistItemForm),
+        body: SingleChildScrollView(
+          child: Form(
+            child: Column(
+              children: <Widget> [
+                Icon(
+                  Icons.check_box,
+                  size: 50,
                 ),
-                keyboardType: TextInputType.text,
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 20.0,
-                ),
-                textAlign: TextAlign.left,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    if (_isPlace) {
-                      return 'Selecione um lugar!';
-                    } else {
-                      return 'O nome não pode ser vazio!';
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    errorStyle: TextStyle(fontSize: 15.0),
+                    labelStyle: TextStyle(color: Colors.blueAccent),
+                    labelText: 'Nome',
+                  ),
+                  keyboardType: TextInputType.text,
+                  style: TextStyle(
+                    color: Colors.blueAccent,
+                    fontSize: 20.0,
+                  ),
+                  textAlign: TextAlign.left,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      if (_isPlace) {
+                        return 'Selecione um lugar!';
+                      } else {
+                        return 'O nome não pode ser vazio!';
+                      }
                     }
-                  }
-                  return null;
-                },
-              ),
-              Visibility(
-                child: FlatButton.icon(
-                  color: Colors.blueAccent,
-                  textColor: Colors.white,
-                  icon: Icon(Icons.location_on),
-                  label: Text('Selecionar Lugar'),
-                  onPressed: () async {
-                    double latitude = 0.0;
-                    double longitude = 0.0;
-                    if  (_coordinates.isNotEmpty) {
-                      List<String> latlng = _coordinates.split(',');
-                      latitude = double.parse(latlng[0]);
-                      longitude = double.parse(latlng[1]);
-                    }
-                    LocationResult result = await Navigator.push(context, MaterialPageRoute(
-                      builder: (_context) => MapScreen(
-                        initialLocation: _coordinates.isNotEmpty ? LatLng(latitude, longitude) : null,
-                      ),
-                    ));
-                    if (result != null) {
-                      latitude = result.latLng.latitude;
-                      longitude = result.latLng.longitude;
-                      setState(() {
-                        _nameController.text = result.name;
-                        _coordinates = '$latitude,$longitude';
-                      });
-                    }
+                    return null;
+                  },
+                  onChanged: (String text) {
+                    _hasModified = true;
                   },
                 ),
-                visible: _isPlace,
-              ),
-              _buildButton(),
-            ],
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+                Visibility(
+                  child: FlatButton.icon(
+                    color: Colors.blueAccent,
+                    textColor: Colors.white,
+                    icon: Icon(Icons.location_on),
+                    label: Text('Selecionar Lugar'),
+                    onPressed: () async {
+                      double latitude = 0.0;
+                      double longitude = 0.0;
+                      if  (_coordinates.isNotEmpty) {
+                        List<String> latlng = _coordinates.split(',');
+                        latitude = double.parse(latlng[0]);
+                        longitude = double.parse(latlng[1]);
+                      }
+                      LocationResult result = await Navigator.push(context, MaterialPageRoute(
+                        builder: (_context) => MapScreen(
+                          initialLocation: _coordinates.isNotEmpty ? LatLng(latitude, longitude) : null,
+                        ),
+                      ));
+                      if (result != null) {
+                        _hasModified = true;
+                        latitude = result.latLng.latitude;
+                        longitude = result.latLng.longitude;
+                        setState(() {
+                          _nameController.text = result.name;
+                          _coordinates = '$latitude,$longitude';
+                        });
+                      }
+                    },
+                  ),
+                  visible: _isPlace,
+                ),
+                _buildButton(),
+              ],
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+            ),
+            key: _formKey,
           ),
-          key: _formKey,
+          padding: EdgeInsets.all(20.0),
         ),
-        padding: EdgeInsets.all(20.0),
       ),
+      onWillPop: () => WillPopDialogs.instance.onWillPopForm(context, _hasModified),
     );
   }
 
@@ -173,6 +182,7 @@ class _ChecklistItemFormScreenState extends State<ChecklistItemFormScreen> {
   }
 
   void _resetFields() {
+    _hasModified = false;
     setState(() {
       if (widget.item == null) {
         _isCreating = true;

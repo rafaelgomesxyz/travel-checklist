@@ -10,6 +10,7 @@ import 'package:travel_checklist/screens/MapScreen.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
 import 'package:travel_checklist/enums.dart';
+import 'package:travel_checklist/services/WillPopDialogs.dart';
 
 class TripFormScreen extends StatefulWidget {
   final Trip trip;
@@ -22,6 +23,7 @@ class TripFormScreen extends StatefulWidget {
 }
 
 class _TripFormScreenState extends State<TripFormScreen> {
+  bool _hasModified = false;
   DateFormat _dateFormat;
   bool _isCreating = true;
   String _title = '';
@@ -59,201 +61,219 @@ class _TripFormScreenState extends State<TripFormScreen> {
   @override
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_title),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              _resetFields();
-            },
-          ),
-        ],
-      ),
-      drawer: AppDrawer(currentScreen: Screen.TripForm),
-      body: SingleChildScrollView(
-        child: Form(
-          child: Column(
-            children: <Widget> [
-              Icon(
-                Icons.flight,
-                size: 50,
-              ),
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  errorStyle: TextStyle(fontSize: 15.0),
-                  labelStyle: TextStyle(color: Colors.blueAccent),
-                  labelText: 'Nome',
-                ),
-                keyboardType: TextInputType.text,
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 20.0,
-                ),
-                textAlign: TextAlign.left,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'O nome não pode ser vazio!';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _destinationController,
-                decoration: InputDecoration(
-                  errorStyle: TextStyle(fontSize: 15.0),
-                  labelStyle: TextStyle(color: Colors.blueAccent),
-                  labelText: 'Destino',
-                ),
-                keyboardType: TextInputType.text,
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 20.0,
-                ),
-                textAlign: TextAlign.left,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Selecione um destino!';
-                  }
-                  if (_destinationCoordinates.isEmpty) {
-                    return 'Destino inválido!';
-                  }
-                  return null;
-                },
-              ),
-              FlatButton.icon(
-                color: Colors.blueAccent,
-                textColor: Colors.white,
-                icon: Icon(Icons.place),
-                label: Text('Selecionar Destino'),
-                onPressed: () async {
-                  double latitude = 0.0;
-                  double longitude = 0.0;
-                  if (_destinationCoordinates.isNotEmpty) {
-                    List<String> latlng = _destinationCoordinates.split(',');
-                    latitude = double.parse(latlng[0]);
-                    longitude = double.parse(latlng[1]);
-                  }
-                  LocationResult result = await Navigator.push(context, MaterialPageRoute(
-                    builder: (_context) => MapScreen(
-                      initialLocation: _destinationCoordinates.isNotEmpty ? LatLng(latitude, longitude) : null,
-                    ),
-                  ));
-                  if (result != null) {
-                    latitude = result.latLng.latitude;
-                    longitude = result.latLng.longitude;
-                    setState(() {
-                      _destinationController.text = result.name;
-                      _destinationCoordinates = '$latitude,$longitude';
-                    });
-                  }
-                },
-              ),
-              TextFormField(
-                controller: _departureTimestampController,
-                decoration: InputDecoration(
-                  errorStyle: TextStyle(fontSize: 15.0),
-                  labelStyle: TextStyle(color: Colors.blueAccent),
-                  labelText: 'Data de Ida',
-                ),
-                keyboardType: TextInputType.text,
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 20.0,
-                ),
-                textAlign: TextAlign.left,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Selecione uma data!';
-                  }
-                  try {
-                    _dateFormat.parse(_departureTimestampController.text);
-                  } catch (err) {
-                    return 'Data inválida!';
-                  }
-                  return null;
-                },
-              ),
-              FlatButton.icon(
-                color: Colors.blueAccent,
-                textColor: Colors.white,
-                icon: Icon(Icons.calendar_today),
-                label: Text('Selecionar Data'),
-                onPressed: () {
-                  DatePicker.showDateTimePicker(
-                    context,
-                    currentTime: _departureDate.millisecondsSinceEpoch <= now.millisecondsSinceEpoch ? now.add(Duration(minutes: 1)) : _departureDate,
-                    locale: LocaleType.pt,
-                    minTime: now,
-                    onConfirm: (date) {
-                      setState(() {
-                        _departureDate = date;
-                        _departureTimestampController.text = _dateFormat.format(_departureDate);
-                        if (_returnDate.millisecondsSinceEpoch <= _departureDate.millisecondsSinceEpoch) {
-                          _returnDate = _departureDate.add(Duration(minutes: 2));
-                        }
-                      });
-                    },
-                    showTitleActions: true,
-                  );
-                },
-              ),
-              TextFormField(
-                controller: _returnTimestampController,
-                decoration: InputDecoration(
-                  errorStyle: TextStyle(fontSize: 15.0),
-                  labelStyle: TextStyle(color: Colors.blueAccent),
-                  labelText: 'Data de Volta',
-                ),
-                keyboardType: TextInputType.text,
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 20.0,
-                ),
-                textAlign: TextAlign.left,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Selecione uma data!';
-                  }
-                  try {
-                    _dateFormat.parse(_returnTimestampController.text);
-                  } catch (err) {
-                    return 'Data inválida!';
-                  }
-                  return null;
-                },
-              ),
-              FlatButton.icon(
-                color: Colors.blueAccent,
-                textColor: Colors.white,
-                icon: Icon(Icons.calendar_today),
-                label: Text('Selecionar Data'),
-                onPressed: () {
-                  DatePicker.showDateTimePicker(
-                    context,
-                    currentTime: _returnDate,
-                    locale: LocaleType.pt,
-                    minTime: _departureDate.add(Duration(minutes: 1)),
-                    onConfirm: (date) {
-                      setState(() {
-                        _returnDate = date;
-                        _returnTimestampController.text = _dateFormat.format(_returnDate);
-                      });
-                    },
-                    showTitleActions: true,
-                  );
-                },
-              ),
-              _buildButton(),
-            ],
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-          ),
-          key: _formKey,
+    return WillPopScope(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_title),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: () {
+                _resetFields();
+              },
+            ),
+          ],
         ),
-        padding: EdgeInsets.all(20.0),
+        drawer: AppDrawer(currentScreen: Screen.TripForm),
+        body: SingleChildScrollView(
+          child: Form(
+            child: Column(
+              children: <Widget> [
+                Icon(
+                  Icons.flight,
+                  size: 50,
+                ),
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    errorStyle: TextStyle(fontSize: 15.0),
+                    labelStyle: TextStyle(color: Colors.blueAccent),
+                    labelText: 'Nome',
+                  ),
+                  keyboardType: TextInputType.text,
+                  style: TextStyle(
+                    color: Colors.blueAccent,
+                    fontSize: 20.0,
+                  ),
+                  textAlign: TextAlign.left,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'O nome não pode ser vazio!';
+                    }
+                    return null;
+                  },
+                  onChanged: (String text) {
+                    _hasModified = true;
+                  },
+                ),
+                TextFormField(
+                  controller: _destinationController,
+                  decoration: InputDecoration(
+                    errorStyle: TextStyle(fontSize: 15.0),
+                    labelStyle: TextStyle(color: Colors.blueAccent),
+                    labelText: 'Destino',
+                  ),
+                  keyboardType: TextInputType.text,
+                  style: TextStyle(
+                    color: Colors.blueAccent,
+                    fontSize: 20.0,
+                  ),
+                  textAlign: TextAlign.left,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Selecione um destino!';
+                    }
+                    if (_destinationCoordinates.isEmpty) {
+                      return 'Destino inválido!';
+                    }
+                    return null;
+                  },
+                  onChanged: (String text) {
+                    _hasModified = true;
+                  },
+                ),
+                FlatButton.icon(
+                  color: Colors.blueAccent,
+                  textColor: Colors.white,
+                  icon: Icon(Icons.place),
+                  label: Text('Selecionar Destino'),
+                  onPressed: () async {
+                    double latitude = 0.0;
+                    double longitude = 0.0;
+                    if (_destinationCoordinates.isNotEmpty) {
+                      List<String> latlng = _destinationCoordinates.split(',');
+                      latitude = double.parse(latlng[0]);
+                      longitude = double.parse(latlng[1]);
+                    }
+                    LocationResult result = await Navigator.push(context, MaterialPageRoute(
+                      builder: (_context) => MapScreen(
+                        initialLocation: _destinationCoordinates.isNotEmpty ? LatLng(latitude, longitude) : null,
+                      ),
+                    ));
+                    if (result != null) {
+                      _hasModified = true;
+                      latitude = result.latLng.latitude;
+                      longitude = result.latLng.longitude;
+                      setState(() {
+                        _destinationController.text = result.name;
+                        _destinationCoordinates = '$latitude,$longitude';
+                      });
+                    }
+                  },
+                ),
+                TextFormField(
+                  controller: _departureTimestampController,
+                  decoration: InputDecoration(
+                    errorStyle: TextStyle(fontSize: 15.0),
+                    labelStyle: TextStyle(color: Colors.blueAccent),
+                    labelText: 'Data de Ida',
+                  ),
+                  keyboardType: TextInputType.text,
+                  style: TextStyle(
+                    color: Colors.blueAccent,
+                    fontSize: 20.0,
+                  ),
+                  textAlign: TextAlign.left,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Selecione uma data!';
+                    }
+                    try {
+                      _dateFormat.parse(_departureTimestampController.text);
+                    } catch (err) {
+                      return 'Data inválida!';
+                    }
+                    return null;
+                  },
+                  onChanged: (String text) {
+                    _hasModified = true;
+                  },
+                ),
+                FlatButton.icon(
+                  color: Colors.blueAccent,
+                  textColor: Colors.white,
+                  icon: Icon(Icons.calendar_today),
+                  label: Text('Selecionar Data'),
+                  onPressed: () {
+                    DatePicker.showDateTimePicker(
+                      context,
+                      currentTime: _departureDate.millisecondsSinceEpoch <= now.millisecondsSinceEpoch ? now.add(Duration(minutes: 1)) : _departureDate,
+                      locale: LocaleType.pt,
+                      minTime: now,
+                      onConfirm: (date) {
+                        _hasModified = true;
+                        setState(() {
+                          _departureDate = date;
+                          _departureTimestampController.text = _dateFormat.format(_departureDate);
+                          if (_returnDate.millisecondsSinceEpoch <= _departureDate.millisecondsSinceEpoch) {
+                            _returnDate = _departureDate.add(Duration(minutes: 2));
+                          }
+                        });
+                      },
+                      showTitleActions: true,
+                    );
+                  },
+                ),
+                TextFormField(
+                  controller: _returnTimestampController,
+                  decoration: InputDecoration(
+                    errorStyle: TextStyle(fontSize: 15.0),
+                    labelStyle: TextStyle(color: Colors.blueAccent),
+                    labelText: 'Data de Volta',
+                  ),
+                  keyboardType: TextInputType.text,
+                  style: TextStyle(
+                    color: Colors.blueAccent,
+                    fontSize: 20.0,
+                  ),
+                  textAlign: TextAlign.left,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Selecione uma data!';
+                    }
+                    try {
+                      _dateFormat.parse(_returnTimestampController.text);
+                    } catch (err) {
+                      return 'Data inválida!';
+                    }
+                    return null;
+                  },
+                  onChanged: (String text) {
+                    _hasModified = true;
+                  },
+                ),
+                FlatButton.icon(
+                  color: Colors.blueAccent,
+                  textColor: Colors.white,
+                  icon: Icon(Icons.calendar_today),
+                  label: Text('Selecionar Data'),
+                  onPressed: () {
+                    DatePicker.showDateTimePicker(
+                      context,
+                      currentTime: _returnDate,
+                      locale: LocaleType.pt,
+                      minTime: _departureDate.add(Duration(minutes: 1)),
+                      onConfirm: (date) {
+                        _hasModified = true;
+                        setState(() {
+                          _returnDate = date;
+                          _returnTimestampController.text = _dateFormat.format(_returnDate);
+                        });
+                      },
+                      showTitleActions: true,
+                    );
+                  },
+                ),
+                _buildButton(),
+              ],
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+            ),
+            key: _formKey,
+          ),
+          padding: EdgeInsets.all(20.0),
+        ),
       ),
+      onWillPop: () => WillPopDialogs.instance.onWillPopForm(context, _hasModified),
     );
   }
 
@@ -300,6 +320,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
   }
 
   void _resetFields() {
+    _hasModified = false;
     setState(() {
       if (widget.trip == null) {
         _isCreating = true;

@@ -5,6 +5,7 @@ import 'package:travel_checklist/models/Checklist.dart';
 import 'package:travel_checklist/services/DatabaseHelper.dart';
 import 'package:travel_checklist/services/EventDispatcher.dart';
 import 'package:travel_checklist/enums.dart';
+import 'package:travel_checklist/services/WillPopDialogs.dart';
 
 class ChecklistFormScreen extends StatefulWidget {
   final Checklist checklist;
@@ -17,6 +18,7 @@ class ChecklistFormScreen extends StatefulWidget {
 }
 
 class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
+  bool _hasModified = false;
   bool _isCreating = true;
   String _title = '';
   bool _forPlaces = false;
@@ -42,77 +44,84 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_title),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              _resetFields();
-            }
-          ),
-        ],
-      ),
-      drawer: AppDrawer(currentScreen: Screen.ChecklistForm),
-      body: SingleChildScrollView(
-        child: Form(
-          child: Column(
-            children: <Widget>[
-              Icon(
-                Icons.playlist_add_check,
-                size: 50,
-              ),
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  errorStyle: TextStyle(fontSize: 15.0),
-                  labelStyle: TextStyle(color: Colors.blueAccent),
-                  labelText: 'Nome',
-                ),
-                keyboardType: TextInputType.text,
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 20.0,
-                ),
-                textAlign: TextAlign.left,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'O nome não pode ser vazio!';
-                  }
-                  return null;
-                },
-              ),
-              Visibility(
-                child: Row(
-                  children: <Widget> [
-                    Checkbox(
-                      onChanged: (bool isChecked) {
-                        setState(() {
-                          _forPlaces = isChecked;
-                        });
-                      },
-                      value: _forPlaces,
-                    ),
-                    Text(
-                      'Criar checklist para lugares.',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                visible: _isCreating,
-              ),
-              _buildButton(),
-            ],
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-          ),
-          key: _formKey,
+    return WillPopScope(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_title),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: () {
+                _resetFields();
+              }
+            ),
+          ],
         ),
-        padding: EdgeInsets.all(20.0),
+        drawer: AppDrawer(currentScreen: Screen.ChecklistForm),
+        body: SingleChildScrollView(
+          child: Form(
+            child: Column(
+              children: <Widget>[
+                Icon(
+                  Icons.playlist_add_check,
+                  size: 50,
+                ),
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    errorStyle: TextStyle(fontSize: 15.0),
+                    labelStyle: TextStyle(color: Colors.blueAccent),
+                    labelText: 'Nome',
+                  ),
+                  keyboardType: TextInputType.text,
+                  style: TextStyle(
+                    color: Colors.blueAccent,
+                    fontSize: 20.0,
+                  ),
+                  textAlign: TextAlign.left,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'O nome não pode ser vazio!';
+                    }
+                    return null;
+                  },
+                  onChanged: (String text) {
+                    _hasModified = true;
+                  },
+                ),
+                Visibility(
+                  child: Row(
+                    children: <Widget> [
+                      Checkbox(
+                        onChanged: (bool isChecked) {
+                          _hasModified = true;
+                          setState(() {
+                            _forPlaces = isChecked;
+                          });
+                        },
+                        value: _forPlaces,
+                      ),
+                      Text(
+                        'Criar checklist para lugares.',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  visible: _isCreating,
+                ),
+                _buildButton(),
+              ],
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+            ),
+            key: _formKey,
+          ),
+          padding: EdgeInsets.all(20.0),
+        ),
       ),
+      onWillPop: () => WillPopDialogs.instance.onWillPopForm(context, _hasModified),
     );
   }
 
@@ -154,6 +163,7 @@ class _ChecklistFormScreenState extends State<ChecklistFormScreen> {
   }
 
   void _resetFields() {
+    _hasModified = false;
     setState(() {
       if (widget.checklist == null) {
         _isCreating = true;
