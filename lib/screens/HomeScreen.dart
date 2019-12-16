@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    margin: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
+                    margin: EdgeInsets.all(10.0),
                   ),
                   Container(
                     child: ButtonTheme(
