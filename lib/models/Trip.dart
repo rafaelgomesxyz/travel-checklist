@@ -8,6 +8,7 @@ class Trip {
   int departureTimestamp = 0;
   int returnTimestamp = 0;
   int notificationHours = 0;
+  bool isPast = false;
   List<Checklist> checklists = [];
 
   Trip();

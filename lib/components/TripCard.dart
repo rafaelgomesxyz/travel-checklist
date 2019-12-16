@@ -72,6 +72,7 @@ class _TripCardState extends State<TripCard> {
           ],
           crossAxisAlignment: CrossAxisAlignment.start,
         ),
+        color: _trip.isPast ? Colors.transparent : Colors.white,
         margin: EdgeInsets.all(10.0),
       ),
       onLongPress: () {

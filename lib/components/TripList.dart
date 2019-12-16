@@ -113,22 +113,41 @@ class _TripListState extends State<TripList> {
       }
     } else {
       trips = await _dbHelper.getTrips();
+      if (_numToShow > 0) {
+        DateTime now = DateTime.now();
+        List<Trip> filteredTrips = [];
+        for (Trip trip in trips) {
+          if (trip.departureTimestamp > now.millisecondsSinceEpoch) {
+            filteredTrips.add(trip);
+          }
+        }
+        trips = filteredTrips;
+        if (trips.length > _numToShow) {
+          trips.removeRange(_numToShow, trips.length);
+        }
+      }
     }
     _listController.sink.add(trips);
   }
 
   void _sortList(List<Trip> trips) {
+    DateTime now = DateTime.now();
     trips.sort((Trip a, Trip b) {
       if (a.departureTimestamp > b.departureTimestamp) {
+        if (b.departureTimestamp <= now.millisecondsSinceEpoch) {
+          b.isPast = true;
+          return -1;
+        }
         return 1;
       }
       if (b.departureTimestamp > a.departureTimestamp) {
+        if (a.departureTimestamp <= now.millisecondsSinceEpoch) {
+          a.isPast = true;
+          return 1;
+        }
         return -1;
       }
       return 0;
     });
-    if (_numToShow > 0 && trips.length > _numToShow) {
-      trips.removeRange(_numToShow, trips.length);
-    }
   }
 }
