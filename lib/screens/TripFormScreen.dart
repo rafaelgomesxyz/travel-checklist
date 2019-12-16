@@ -378,7 +378,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 await NotificationManager.instance.scheduleNotification(
                   trip.id,
                   'Tudo pronto para ${trip.name}?',
-                  'Sua viagem começa em ${trip.notificationHours} hora${widget.trip.notificationHours > 1 ? 's' : ''}!',
+                  'Sua viagem começa em ${trip.notificationHours} hora${trip.notificationHours > 1 ? 's' : ''}!',
                   _notificationDate,
                 );
               }
