@@ -74,7 +74,7 @@ class _ChecklistCardState extends State<ChecklistCard> {
                 ],
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
               ),
-              padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 0.0),
+              padding: EdgeInsets.all(10.0),
             ),
             LinearProgressIndicator(
               value: percentage,
